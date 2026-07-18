@@ -27,6 +27,7 @@ _load_env()
 
 sys.path.insert(0, os.path.join(HERE, "..", "core"))
 sys.path.insert(0, os.path.join(HERE, "..", "agent"))
+sys.path.insert(0, os.path.join(HERE, "..", "evals"))
 import clinical_core as core
 
 DATA = os.path.join(HERE, "..", "data", "patients.json")
@@ -230,6 +231,9 @@ class H(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/api/patients":
             return self._send({"patients": list(PATIENTS.values())})
+        if self.path == "/api/evals":
+            import eval_summary
+            return self._send(eval_summary.compute())
         self._send({"error": "not found"}, 404)
 
     def do_POST(self):

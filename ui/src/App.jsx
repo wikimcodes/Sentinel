@@ -402,10 +402,223 @@ function Bucket({ title, items, tone, suppress }) {
 }
 
 // ---------------------------------------------------------------------------
+const Arrow = () => (
+  <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+    <path d="M0,0 L7,3 L0,6 Z" className="ah" />
+  </marker>
+);
+
+function ArchitectureView() {
+  const tools = ["stage_patient", "egfr_trajectory", "evaluate_medications", "referral", "suppression_rules"];
+  const principles = [
+    ["Deterministic core, not RAG", "Guideline logic is encoded as testable thresholds the agent cannot override — stronger than retrieving text and hoping."],
+    ["Suppression is the moat", "Knowing what NOT to surface is the scarce resource; it's first-class logic, shown to the clinician with its reason."],
+    ["Validated end-to-end", "The eval harness scores the core (F1 92.7%) and the live agent (F1 89.8%) against a clinician's golden set."],
+    ["Scales with model intelligence", "Swap in the next model; reasoning, judgment and computer-use all improve — the product gets better for free."],
+  ];
+  return (
+    <section className="right open story">
+      <header className="detail-head"><div>
+        <h2>Agent architecture</h2>
+        <p className="sub">Sentinel plans and orchestrates; a deterministic core owns every number</p>
+      </div></header>
+
+      <div className="diagram-wrap">
+        <svg viewBox="0 0 760 552" className="diagram" role="img" aria-label="Sentinel agent architecture">
+          <defs><Arrow /></defs>
+          {/* spine */}
+          <line x1="380" y1="74" x2="380" y2="114" className="edge" markerEnd="url(#ah)" />
+          <line x1="380" y1="244" x2="380" y2="284" className="edge" markerEnd="url(#ah)" />
+          <line x1="380" y1="348" x2="380" y2="384" className="edge" markerEnd="url(#ah)" />
+          <line x1="380" y1="440" x2="380" y2="472" className="edge" markerEnd="url(#ah)" />
+          {/* agent <-> core */}
+          <line x1="534" y1="158" x2="564" y2="158" className="edge" markerEnd="url(#ah)" />
+          <line x1="564" y1="200" x2="534" y2="200" className="edge" markerEnd="url(#ah)" />
+          <text x="549" y="150" className="elbl" textAnchor="middle">calls</text>
+          <text x="549" y="216" className="elbl" textAnchor="middle">numbers</text>
+          {/* eval -> agent */}
+          <line x1="184" y1="180" x2="226" y2="180" className="edge dash" markerEnd="url(#ah)" />
+
+          <g><rect x="280" y="24" width="200" height="50" rx="12" className="node" />
+            <text x="380" y="46" className="nt" textAnchor="middle">EHR record</text>
+            <text x="380" y="63" className="ns" textAnchor="middle">FHIR · GP Connect · SMART launch</text></g>
+
+          <g><rect x="226" y="114" width="308" height="128" rx="16" className="node agent" />
+            <text x="380" y="144" className="nt big" textAnchor="middle">Sentinel Agent</text>
+            <text x="380" y="167" className="ns" textAnchor="middle">plans · calls tools · composes the review</text>
+            <text x="380" y="184" className="ns" textAnchor="middle">reasons, but never does the arithmetic</text>
+            <text x="380" y="216" className="loop" textAnchor="middle">plan → call → observe → compose ⟳</text></g>
+
+          <g><rect x="564" y="98" width="186" height="220" rx="14" className="cluster" />
+            <text x="657" y="116" className="clbl" textAnchor="middle">DETERMINISTIC CORE</text>
+            {tools.map((t, i) => (
+              <g key={t}><rect x="576" y={126 + i * 36} width="162" height="28" rx="8" className="node tool" />
+                <text x="657" y={144 + i * 36} className="tt" textAnchor="middle">{t}</text></g>
+            ))}</g>
+
+          <g><rect x="24" y="140" width="160" height="82" rx="12" className="node eval" />
+            <text x="104" y="164" className="nt" textAnchor="middle">Eval harness</text>
+            <text x="104" y="184" className="ns" textAnchor="middle">core F1 92.7%</text>
+            <text x="104" y="200" className="ns" textAnchor="middle">agent F1 89.8%</text>
+            <text x="104" y="216" className="ns" textAnchor="middle">vs clinician gold</text></g>
+
+          <g><rect x="242" y="284" width="276" height="60" rx="14" className="node" />
+            <text x="380" y="309" className="nt" textAnchor="middle">Ranked actions · Suppression</text>
+            <text x="380" y="328" className="ns" textAnchor="middle">+ draft referral, each with a KDIGO citation</text></g>
+
+          <g><rect x="254" y="384" width="252" height="56" rx="14" className="node human" />
+            <text x="380" y="408" className="nt" textAnchor="middle">Clinician — accept / override</text>
+            <text x="380" y="426" className="ns" textAnchor="middle">decision support, not autonomous prescribing</text></g>
+
+          <g><rect x="206" y="472" width="348" height="58" rx="14" className="node" />
+            <text x="380" y="497" className="nt" textAnchor="middle">Write-back</text>
+            <text x="380" y="516" className="ns" textAnchor="middle">FHIR ServiceRequest/Task · CDS Hooks · computer use</text></g>
+        </svg>
+      </div>
+
+      <div className="arch-principles">
+        {principles.map(([h, p]) => <div className="pr" key={h}><h4>{h}</h4><p>{p}</p></div>)}
+      </div>
+    </section>
+  );
+}
+
+const PERSONAS = [
+  { key: "amara", name: "Dr. Amara", role: "Panel GP", job: "“Show me which patients changed between visits, so I spend my minutes on the ones who matter.”", jtbd: ["Stratify", "Catch the slow decline"] },
+  { key: "bola", name: "Nurse Bola", role: "Care coordinator", job: "“Give me a prioritised worklist — who needs a lab, a titration, or a referral — so nothing slips.”", jtbd: ["Close the gap", "Draft the escalation"] },
+  { key: "chen", name: "Dr. Chen", role: "Nephrology reviewer", job: "“Show me the reasoning and the ruled-out confounders, so I can trust or overrule in seconds.”", jtbd: ["Withhold (suppression)", "Respect safety gates"] },
+];
+
+function FrameworkView() {
+  // persona -> job -> eval mapping for the diagram
+  const P = [{ n: "Dr. Amara", r: "Panel GP", cls: "amara", y: 78 },
+             { n: "Nurse Bola", r: "Coordinator", cls: "bola", y: 210 },
+             { n: "Dr. Chen", r: "Reviewer", cls: "chen", y: 330 }];
+  const J = [{ j: "Stratify", p: 0, ev: "C1 · staging", y: 44 },
+             { j: "Catch decline", p: 0, ev: "C2 · progression", y: 104 },
+             { j: "Close the gap", p: 1, ev: "C4 · gap fire", y: 178 },
+             { j: "Draft escalation", p: 1, ev: "C7 · referral", y: 238 },
+             { j: "Withhold", p: 2, ev: "C3/C5 · suppression", y: 312 },
+             { j: "Safety gate", p: 2, ev: "C6 · gating", y: 372 }];
+  return (
+    <section className="right open story">
+      <header className="detail-head"><div>
+        <h2>Persona · jobs-to-be-done framework</h2>
+        <p className="sub">Who it's for → what they need done → how each is measured</p>
+      </div></header>
+
+      <div className="diagram-wrap">
+        <svg viewBox="0 0 760 420" className="diagram" role="img" aria-label="Persona to jobs to evals mapping">
+          <defs><Arrow /></defs>
+          <text x="95" y="22" className="clbl" textAnchor="middle">PERSONA</text>
+          <text x="380" y="22" className="clbl" textAnchor="middle">JOB TO BE DONE</text>
+          <text x="670" y="22" className="clbl" textAnchor="middle">EVAL</text>
+          {/* connectors */}
+          {J.map((job, i) => (
+            <g key={i}>
+              <path d={`M172,${P[job.p].y} C230,${P[job.p].y} 240,${job.y} 300,${job.y}`} className={`edge fw-${P[job.p].cls}`} fill="none" />
+              <line x1="470" y1={job.y} x2="586" y2={job.y} className="edge" markerEnd="url(#ah)" />
+            </g>
+          ))}
+          {/* personas */}
+          {P.map((p, i) => (
+            <g key={i}><rect x="20" y={p.y - 32} width="152" height="64" rx="14" className={`node persona-node ${p.cls}`} />
+              <text x="96" y={p.y - 6} className="nt" textAnchor="middle">{p.n}</text>
+              <text x="96" y={p.y + 13} className="ns" textAnchor="middle">{p.r}</text></g>
+          ))}
+          {/* jobs */}
+          {J.map((job, i) => (
+            <g key={i}><rect x="300" y={job.y - 17} width="170" height="34" rx="9" className="node" />
+              <text x="385" y={job.y + 4} className="tt" textAnchor="middle">{job.j}</text></g>
+          ))}
+          {/* evals */}
+          {J.map((job, i) => (
+            <text key={i} x="590" y={job.y + 4} className="fw-ev">{job.ev}</text>
+          ))}
+        </svg>
+      </div>
+
+      <div className="fw-insight">
+        <strong>Dr. Chen decides adoption.</strong> A GP is impressed by a risk grid; a reviewer only trusts a tool that demonstrably knows what <em>not</em> to say. That's why Chen owns suppression and safety — and why a naive engine scores well for the easy persona (high recall) but collapses on the hard one.
+      </div>
+
+      <div className="persona-grid">
+        {PERSONAS.map((p) => (
+          <div className={`persona ${p.key}`} key={p.key}>
+            <div className="persona-h"><strong>{p.name}</strong><span>{p.role}</span></div>
+            <p className="persona-job">{p.job}</p>
+            <div className="persona-jtbd">{p.jtbd.map((j) => <span key={j} className="jchip">{j}</span>)}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
+function EvalDashboard() {
+  const [d, setD] = useState(null);
+  useEffect(() => { fetch("/api/evals").then((r) => r.json()).then(setD).catch(() => setD({ error: true })); }, []);
+  if (!d) return <section className="right"><p className="hint" style={{ margin: 24 }}>Computing evals against the golden set…</p></section>;
+  if (d.error) return <section className="right"><p className="err">Backend not reachable.</p></section>;
+  const maxF1 = Math.max(...d.rows.map((r) => r.f1));
+  return (
+    <section className="right open eval-page">
+      <header className="detail-head">
+        <div>
+          <h2>How good is Sentinel?</h2>
+          <p className="sub">Scored against {d.against} · n={d.n}</p>
+        </div>
+      </header>
+
+      <div className="moat-cards">
+        <div className="moat-card bad">
+          <span className="moat-big">{d.false_alarm.naive}%</span>
+          <span className="moat-cap">naive rule engine<br />false-alarm rate</span>
+        </div>
+        <span className="moat-arrow">→</span>
+        <div className="moat-card good">
+          <span className="moat-big">{d.false_alarm.sentinel}%</span>
+          <span className="moat-cap">Sentinel<br />false-alarm rate</span>
+        </div>
+        <p className="moat-say">The moat. A naive engine cries wolf on nearly half its alerts — clinicians switch those off. Sentinel's <strong>suppression layer</strong> is what closes the gap.</p>
+      </div>
+
+      <div className="eval-table">
+        <div className="eval-th"><span>Approach</span><span className="num">Precision</span><span className="num">Recall</span><span className="num">F1</span></div>
+        {d.rows.map((r, i) => (
+          <div className={`eval-row ${r.tone}`} key={i}>
+            <div className="eval-name"><strong>{r.name}</strong><span className="eval-sub">{r.sub}</span></div>
+            <span className="num">{r.precision}%</span>
+            <span className="num">{r.recall}%</span>
+            <span className="num f1">
+              <span className="bar"><span className="bar-fill" style={{ width: `${(r.f1 / maxF1) * 100}%` }} /></span>
+              {r.f1}%{r.measured && <span className="measured">live</span>}
+            </span>
+          </div>
+        ))}
+      </div>
+      <p className="eval-foot">Staging accuracy <strong>{d.staging_accuracy}%</strong> · CKD-gate accuracy <strong>{d.ckd_gate_accuracy}%</strong> · core &amp; naive rows computed live just now; the agent row is 50 real Claude tool-calling runs.</p>
+
+      <div className="eval-explain">
+        <h3 className="col-h">What the numbers mean</h3>
+        <div className="ex-grid">
+          <div className="ex"><h4>Precision</h4><p>When Sentinel flags something, how often the clinician agrees. High precision = it doesn't nag.</p></div>
+          <div className="ex"><h4>Recall</h4><p>Of everything the clinician would flag, how much Sentinel catches. High recall = nothing important slips.</p></div>
+          <div className="ex"><h4>False-alarm</h4><p>The share of alerts that are wrong — the reason clinicians disable tools. Sentinel's suppression cuts it from {d.false_alarm.naive}% to {d.false_alarm.sentinel}%.</p></div>
+          <div className="ex"><h4>Why the agent row matters</h4><p>The <strong>live Claude agent</strong> — planning and calling the core tools, doing no arithmetic itself — scores F1 {d.rows[2].f1}% against clinician cases it never saw, within a few points of the deterministic core. The agent is validated, not just the core.</p></div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
 export default function App() {
   const [patients, setPatients] = useState(null);
   const [err, setErr] = useState(null);
   const [id, setId] = useState(null);
+  const [view, setView] = useState("panel");   // panel | evals
 
   useEffect(() => {
     fetch("/api/patients").then((r) => r.json()).then((d) => setPatients(d.patients))
@@ -431,12 +644,17 @@ export default function App() {
           </div>
           <div className="stat"><span className="stat-num">{needAction}</span><span className="stat-label">need action</span></div>
         </div>
+        <div className="rail-nav">
+          {[["panel", "Panel"], ["architecture", "Architecture"], ["framework", "Framework"], ["evals", "Evals"]].map(([v, label]) => (
+            <button key={v} className={view === v ? "active" : ""} onClick={() => setView(v)}>{label}</button>
+          ))}
+        </div>
         {err && <p className="err">{err}</p>}
         <div className="patient-list">
           {rows.map((p) => {
             const tt = TIER[tierOf(p)]; const acts = p.expected.surface.length;
             return (
-              <button key={p.id} className={`row ${p.id === id ? "sel" : ""}`} onClick={() => setId(p.id)}>
+              <button key={p.id} className={`row ${p.id === id ? "sel" : ""}`} onClick={() => { setId(p.id); setView("panel"); }}>
                 <span className="dot" style={{ background: tt.color }} />
                 <span className="row-main"><span className="row-name">{p.name}</span>
                   <span className="row-line">{topLine(p)}</span></span>
@@ -448,7 +666,7 @@ export default function App() {
         </div>
       </aside>
 
-      {selected ? <EHRReview key={selected.id} patient={selected} /> : (
+      {view === "evals" ? <EvalDashboard /> : view === "architecture" ? <ArchitectureView /> : view === "framework" ? <FrameworkView /> : selected ? <EHRReview key={selected.id} patient={selected} /> : (
         <section className="right empty-detail">
           <div><p className="hint-title">Open a patient file</p>
             <p className="hint">Sentinel pre-sifts each record against KDIGO 2024 and surfaces what a 10-minute visit would miss — then lets you act on it.</p></div>
