@@ -46,6 +46,14 @@ A floating mockup window representing the Sentinel patient interface.
 
 Create a card with #2D3B42 background and 40px radius. Inside, place a white container with rounded-3xl corners. Top bar: 3 colored 'window' dots and a skeleton address bar. Content: 3 vertical sections — a patient header row (avatar skeleton, name skeleton, "Stable" status pill), a 2-column vitals grid with one peach block (Heart Rate, e.g. "72 bpm" in serif coral) and one grey block (Blood Pressure, e.g. "118/76"), and a bottom skeleton text block. Footer: A glassmorphism blur bar with a green check-circle icon reading "Vitals synced" and two clinical mono chips (dark rounded rectangles, e.g. "SpO₂ 98%" and "Temp 36.8°").
 
+## Clinical Reasoning Panel (Explainability)
+
+A panel that appears whenever Sentinel surfaces a recommendation or suppresses an alert, explaining the "why" in plain language so the care team can verify the decision.
+
+Create a card with white background, rounded-3xl corners, and a 4px left accent border in #EF4623. Header: a small uppercase label in Manrope (text-xs, tracking-widest, #2D3B42/50) — "Why this was recommended" or "Why this alert was suppressed" — paired with a small 'shield-check' or 'info' icon. Body: a plain-language explanation in Manrope (text-base, leading-relaxed) that states the suppression logic or recommendation rationale.
+
+Referenced guidelines appear as inline hyperlinks (see functional spec for linking behavior). Link styling: color #EF4623, font-medium, a subtle underline (underline-offset-2, decoration-#EF4623/40), and a small trailing external-link icon; on hover, deepen the underline to full opacity. Footer: a muted timestamp and rule-version label in Manrope text-xs, #2D3B42/50.
+
 ## The 'Rotating Logo' Brand Mark
 
 A simple but dynamic logo mark.
@@ -54,4 +62,4 @@ A 36px square container using #EF4623. Apply a 3-degree rotation by default. Ins
 
 # Special Notes
 
-MUST: Use 'Instrument Serif' specifically for emphasis and large headers to maintain the editorial feel. MUST: Use the cubic-bezier(0.16, 1, 0.3, 1) curve for all entry animations. MUST: Use large corner radii (min 24px) for all containers. MUST: Keep clinical copy calm, plain, and specific — vitals, appointments, medications, care plans, alerts. DO NOT: Use standard blue or green for primary actions; stick strictly to #EF4623 (a green check-circle is permitted only as the "synced" status indicator). DO NOT: Use sharp 90-degree corners on any primary UI containers. DO NOT: Overstate medical claims or imply diagnostic capability.
+MUST: Use 'Instrument Serif' specifically for emphasis and large headers to maintain the editorial feel. MUST: Use the cubic-bezier(0.16, 1, 0.3, 1) curve for all entry animations. MUST: Use large corner radii (min 24px) for all containers. MUST: Keep clinical copy calm, plain, and specific — vitals, appointments, medications, care plans, alerts. MUST: Style guideline references as coral (#EF4623) hyperlinks with a subtle underline and a trailing external-link icon (linking behavior and data requirements live in the functional spec, not here). DO NOT: Use standard blue or green for primary actions; stick strictly to #EF4623 (a green check-circle is permitted only as the "synced" status indicator). DO NOT: Use sharp 90-degree corners on any primary UI containers. DO NOT: Overstate medical claims or imply diagnostic capability.
