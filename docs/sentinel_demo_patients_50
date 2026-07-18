@@ -1,0 +1,3406 @@
+{
+  "system": "Sentinel",
+  "guideline_basis": "KDIGO 2024",
+  "data_type": "synthetic",
+  "phi": "none",
+  "action_model": {
+    "lifecycle": [
+      "proposed",
+      "clinician_approved",
+      "executed"
+    ],
+    "approval": "clinician_one_click",
+    "coordination_targets": [
+      "nephrology",
+      "laboratory",
+      "scheduling",
+      "prescriber"
+    ]
+  },
+  "thresholds": {
+    "gfr_categories": {
+      "G1": ">=90",
+      "G2": "60-89",
+      "G3a": "45-59",
+      "G3b": "30-44",
+      "G4": "15-29",
+      "G5": "<15"
+    },
+    "albuminuria_categories_mg_g": {
+      "A1": "<30",
+      "A2": "30-300",
+      "A3": ">300"
+    },
+    "sglt2i": "eGFR >=20 with ACR >=200 mg/g (1A); or heart failure at any ACR; or T2D + CKD with eGFR >=20; eGFR 20-45 with ACR <200 mg/g (2B)",
+    "rasi": "A3 without diabetes (strong, 1B); A2 or A3 with diabetes (strong, 1B); A2 without diabetes (weak, 2C); A1 only for a specific indication (hypertension, HFrEF)",
+    "referral": "KFRE 5-year kidney-failure risk 3-5%; or eGFR <30; or significant albuminuria (A3, ACR >=300 mg/g); or rapid/sustained GFR decline",
+    "rasi_monitoring": "check BP, creatinine and potassium within 2-4 weeks of initiation or dose increase (sooner if low eGFR or borderline potassium)",
+    "egfr_reliability": "creatinine-based eGFR unreliable at extremes of muscle mass; confirm with cystatin C",
+    "suppression_pseudo_rise": "trimethoprim and cimetidine raise creatinine via blocked tubular secretion without true GFR loss"
+  },
+  "patients": [
+    {
+      "id": "P1_RED",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 58,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [],
+      "medications": [
+        "amlodipine",
+        "atorvastatin"
+      ],
+      "labs": [
+        {
+          "date": "2022-06",
+          "eGFR": 44,
+          "ACR": 210,
+          "K": 4.3
+        },
+        {
+          "date": "2023-06",
+          "eGFR": 40,
+          "ACR": 280,
+          "K": 4.4
+        },
+        {
+          "date": "2024-06",
+          "eGFR": 36,
+          "ACR": 340,
+          "K": 4.4
+        },
+        {
+          "date": "2025-06",
+          "eGFR": 33,
+          "ACR": 380,
+          "K": 4.4
+        }
+      ],
+      "expected": {
+        "stage": "G3b A3",
+        "is_ckd": true,
+        "trajectory": "gradual decline ~3.7 mL/min/year over 3 years (sub-rapid, no GFR-category crossing); sustained severe albuminuria (A3)",
+        "surface": [
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR >=20 and ACR >=200 mg/g, non-diabetic (1A)"
+          },
+          {
+            "finding": "RAS inhibitor indicated and not prescribed",
+            "trigger_threshold": "albuminuria A3 without diabetes (strong, 1B)"
+          }
+        ],
+        "suppress": [],
+        "proposed_actions": [
+          {
+            "id": "P1_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor (e.g. dapagliflozin)",
+            "trigger_threshold": "eGFR 33 (>=20) and ACR 380 mg/g (>=200), non-diabetic (1A)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P1_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A3 without diabetes (strong, 1B), currently on amlodipine only",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P1_A3",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E (creatinine, potassium) at RAS inhibitor initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RAS inhibitor initiation monitoring (within 2-4 weeks; sooner given eGFR 33)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P1_A4",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral for very-high-risk CKD",
+            "trigger_threshold": "significant albuminuria (A3, ACR 380 mg/g >=300) and very-high-risk tier",
+            "draft_text": "Re: 58M. Referral for very-high-risk CKD (G3b A3): eGFR 33, ACR 380 mg/g (severely increased albuminuria), non-diabetic, with a gradual eGFR decline over 3 years. Not currently on RAS inhibitor or SGLT2 inhibitor; both proposed. Grateful for specialist assessment and management.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ],
+        "referral": true
+      }
+    },
+    {
+      "id": "P2_ORANGE",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 72,
+        "sex": "F",
+        "diabetes": false
+      },
+      "context": [
+        "low skeletal muscle mass",
+        "frailty"
+      ],
+      "medications": [
+        "amlodipine"
+      ],
+      "labs": [
+        {
+          "date": "2024-01",
+          "eGFR": 55,
+          "ACR": 40,
+          "K": 4.2,
+          "egfr_basis": "creatinine"
+        },
+        {
+          "date": "2025-01",
+          "eGFR": 52,
+          "ACR": 45,
+          "K": 4.2,
+          "egfr_basis": "creatinine"
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2 (face value, creatinine-based)",
+        "is_ckd": true,
+        "trajectory": "stable",
+        "surface": [
+          {
+            "finding": "Creatinine-based eGFR likely overestimates true GFR due to low muscle mass; confirm before staging-driven decisions",
+            "trigger_threshold": "eGFR reliability rule at extremes of muscle mass"
+          }
+        ],
+        "suppress": [],
+        "proposed_actions": [
+          {
+            "id": "P2_A1",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "Cystatin C-based eGFR",
+            "trigger_threshold": "creatinine-based eGFR unreliable in low muscle mass",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "next available"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P2_A2",
+            "type": "defer",
+            "coordination_target": "prescriber",
+            "detail": "Hold staging-driven treatment and referral decisions (including any RASi decision) pending cystatin C result",
+            "trigger_threshold": "true GFR uncertain; avoid acting on potentially falsely reassuring eGFR",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ],
+        "referral": false
+      }
+    },
+    {
+      "id": "P3_GREEN",
+      "risk_tier": "low",
+      "demographics": {
+        "age": 64,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [
+        "current trimethoprim course for urinary tract infection"
+      ],
+      "medications": [
+        "trimethoprim"
+      ],
+      "labs": [
+        {
+          "date": "2023-06",
+          "eGFR": 86,
+          "ACR": 10,
+          "K": 4.3
+        },
+        {
+          "date": "2024-06",
+          "eGFR": 84,
+          "ACR": 12,
+          "K": 4.4
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 66,
+          "ACR": 12,
+          "K": 4.4
+        }
+      ],
+      "expected": {
+        "stage": "G2 A1",
+        "is_ckd": false,
+        "trajectory": "stable at baseline; single transient dip during antibiotic course",
+        "surface": [],
+        "suppress": [
+          {
+            "item": "eGFR drop from 84 to 66 (>20%) on 2025-05",
+            "reason": "non-steady-state creatinine pseudo-rise from trimethoprim; not true GFR loss; not progression; remains G2, not CKD",
+            "trigger_threshold": "suppression rule: trimethoprim blocks tubular secretion of creatinine"
+          }
+        ],
+        "proposed_actions": [
+          {
+            "id": "P3_A1",
+            "type": "schedule_recheck",
+            "coordination_target": "scheduling",
+            "detail": "Routine repeat U&E after trimethoprim course completed to confirm return to baseline",
+            "trigger_threshold": "confirm resolution of transient rise",
+            "priority": "low",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "2 weeks after course end"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ],
+        "referral": false
+      }
+    },
+    {
+      "id": "P04",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 66,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [
+        "acute gastroenteritis at last visit"
+      ],
+      "medications": [
+        "ramipril",
+        "atorvastatin"
+      ],
+      "labs": [
+        {
+          "date": "2023-05",
+          "eGFR": 52,
+          "ACR": 40,
+          "K": 4.4
+        },
+        {
+          "date": "2024-05",
+          "eGFR": 50,
+          "ACR": 42,
+          "K": 4.4
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 34,
+          "ACR": 45,
+          "K": 4.6,
+          "acute": true
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [],
+        "suppress": [
+          {
+            "item": "recent eGFR dip coinciding with acute illness",
+            "reason": "non-steady-state; acute drop, not chronic progression",
+            "trigger_threshold": "suppression rule: exclude non-steady-state values"
+          }
+        ],
+        "referral": false,
+        "proposed_actions": []
+      }
+    },
+    {
+      "id": "P05",
+      "risk_tier": "low",
+      "demographics": {
+        "age": 70,
+        "sex": "F",
+        "diabetes": false
+      },
+      "context": [
+        "cimetidine course"
+      ],
+      "medications": [
+        "amlodipine"
+      ],
+      "labs": [
+        {
+          "date": "2024-02",
+          "eGFR": 78,
+          "ACR": 12,
+          "K": 4.3
+        },
+        {
+          "date": "2025-02",
+          "eGFR": 63,
+          "ACR": 14,
+          "K": 4.4,
+          "acute": true
+        }
+      ],
+      "expected": {
+        "stage": "G2 A1",
+        "is_ckd": false,
+        "risk_tier": "low",
+        "trajectory": "single steady value",
+        "surface": [],
+        "suppress": [
+          {
+            "item": "recent creatinine rise on cimetidine",
+            "reason": "pseudo-rise from blocked tubular secretion; not true GFR loss",
+            "trigger_threshold": "suppression rule: trimethoprim/cimetidine pseudo-rise"
+          }
+        ],
+        "referral": false,
+        "proposed_actions": [],
+        "note": "not CKD (no eGFR reduction and no damage marker); no CKD action"
+      }
+    },
+    {
+      "id": "P06",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 74,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [
+        "below-knee amputation",
+        "low muscle mass"
+      ],
+      "medications": [
+        "amlodipine"
+      ],
+      "labs": [
+        {
+          "date": "2024-03",
+          "eGFR": 54,
+          "ACR": 35,
+          "K": 4.2
+        },
+        {
+          "date": "2025-03",
+          "eGFR": 52,
+          "ACR": 38,
+          "K": 4.2
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "creatinine-based eGFR likely overestimates true GFR (muscle mass); confirm before staging-driven decisions",
+            "trigger_threshold": "eGFR reliability rule at extremes of muscle mass"
+          }
+        ],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P06_A1",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "Cystatin C-based eGFR",
+            "trigger_threshold": "creatinine-based eGFR unreliable (muscle mass)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "next available"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P06_A2",
+            "type": "defer",
+            "coordination_target": "prescriber",
+            "detail": "Hold staging-driven treatment and referral decisions pending cystatin C result",
+            "trigger_threshold": "true GFR uncertain; avoid acting on unreliable eGFR",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P07",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 68,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [
+        "hospital admission with recovered AKI"
+      ],
+      "medications": [
+        "ramipril",
+        "atorvastatin",
+        "dapagliflozin"
+      ],
+      "labs": [
+        {
+          "date": "2024-06",
+          "eGFR": 48,
+          "ACR": 220,
+          "K": 4.5
+        },
+        {
+          "date": "2025-01",
+          "eGFR": 30,
+          "ACR": 230,
+          "K": 4.8,
+          "acute": true
+        },
+        {
+          "date": "2025-06",
+          "eGFR": 47,
+          "ACR": 225,
+          "K": 4.5
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "stable",
+        "surface": [],
+        "suppress": [
+          {
+            "item": "in-hospital eGFR nadir that recovered to baseline",
+            "reason": "resolved AKI; not chronic progression",
+            "trigger_threshold": "suppression rule: resolved AKI"
+          }
+        ],
+        "referral": false,
+        "proposed_actions": []
+      }
+    },
+    {
+      "id": "P08",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 61,
+        "sex": "F",
+        "diabetes": true
+      },
+      "context": [
+        "dapagliflozin started 6 weeks ago"
+      ],
+      "medications": [
+        "ramipril",
+        "dapagliflozin",
+        "atorvastatin",
+        "metformin"
+      ],
+      "labs": [
+        {
+          "date": "2025-03",
+          "eGFR": 58,
+          "ACR": 260,
+          "K": 4.5
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 52,
+          "ACR": 210,
+          "K": 4.6,
+          "acute": true
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "single steady value",
+        "surface": [
+          {
+            "finding": "Nonsteroidal MRA (finerenone) indicated and not prescribed",
+            "trigger_threshold": "T2D, albuminuria, on max RASi, eGFR>25, K normal (REC 3.8.1, 2A)"
+          }
+        ],
+        "suppress": [
+          {
+            "item": "small eGFR dip after SGLT2i initiation",
+            "reason": "expected reversible haemodynamic dip; not progression; not a reason to stop",
+            "trigger_threshold": "PP 3.7.3: reversible initiation dip"
+          }
+        ],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P08_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Consider finerenone (with potassium monitoring)",
+            "trigger_threshold": "T2D + albuminuria on RASi, eGFR>25, normal K",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P09",
+      "risk_tier": "low",
+      "demographics": {
+        "age": 44,
+        "sex": "F",
+        "diabetes": false
+      },
+      "context": [
+        "healthy screening"
+      ],
+      "medications": [],
+      "labs": [
+        {
+          "date": "2025-04",
+          "eGFR": 98,
+          "ACR": 8,
+          "K": 4.2
+        }
+      ],
+      "expected": {
+        "stage": "G1 A1",
+        "is_ckd": false,
+        "risk_tier": "low",
+        "trajectory": "single steady value",
+        "surface": [],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [],
+        "note": "not CKD (no eGFR reduction and no damage marker); no CKD action"
+      }
+    },
+    {
+      "id": "P10",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 63,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [
+        "fully treated"
+      ],
+      "medications": [
+        "ramipril",
+        "dapagliflozin",
+        "atorvastatin"
+      ],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 42,
+          "ACR": 330,
+          "K": 4.6
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 40,
+          "ACR": 320,
+          "K": 4.6
+        }
+      ],
+      "expected": {
+        "stage": "G3b A3",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P10_A1",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "significant albuminuria (A3)",
+            "draft_text": "Re: 63M. Referral for G3b A3 CKD (eGFR 40, ACR 320 mg/g); significant albuminuria (A3). Diabetes=False. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ],
+        "note": "already optimised or no gap; nothing to surface (no nag)"
+      }
+    },
+    {
+      "id": "P11",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 59,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [
+        "hyperkalaemia"
+      ],
+      "medications": [
+        "amlodipine",
+        "atorvastatin"
+      ],
+      "labs": [
+        {
+          "date": "2024-06",
+          "eGFR": 47,
+          "ACR": 360,
+          "K": 5.7
+        },
+        {
+          "date": "2025-06",
+          "eGFR": 45,
+          "ACR": 380,
+          "K": 5.7
+        }
+      ],
+      "expected": {
+        "stage": "G3a A3",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "RAS inhibitor indicated (strong) but gated on hyperkalaemia",
+            "trigger_threshold": "albuminuria A3; K 5.7 > 5.0 - treat potassium first"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR>=20 & ACR>=200"
+          }
+        ],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P11_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR>=20 & ACR>=200",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P11_A2",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "significant albuminuria (A3)",
+            "draft_text": "Re: 59M. Referral for G3a A3 CKD (eGFR 45, ACR 380 mg/g); significant albuminuria (A3). Diabetes=False. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P12",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 64,
+        "sex": "F",
+        "diabetes": true
+      },
+      "context": [
+        "borderline potassium"
+      ],
+      "medications": [
+        "ramipril",
+        "metformin",
+        "atorvastatin"
+      ],
+      "labs": [
+        {
+          "date": "2024-06",
+          "eGFR": 42,
+          "ACR": 340,
+          "K": 5.6
+        },
+        {
+          "date": "2025-06",
+          "eGFR": 40,
+          "ACR": 350,
+          "K": 5.6
+        }
+      ],
+      "expected": {
+        "stage": "G3b A3",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR>=20 & ACR>=200"
+          },
+          {
+            "finding": "Finerenone indicated but gated on hyperkalaemia",
+            "trigger_threshold": "K 5.6 > 5.0 - requires normal potassium"
+          }
+        ],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P12_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR>=20 & ACR>=200",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P12_A2",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "significant albuminuria (A3)",
+            "draft_text": "Re: 64F. Referral for G3b A3 CKD (eGFR 40, ACR 350 mg/g); significant albuminuria (A3). Diabetes=True. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P13",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 55,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [
+        "fast decline"
+      ],
+      "medications": [
+        "amlodipine"
+      ],
+      "labs": [
+        {
+          "date": "2022-06",
+          "eGFR": 70,
+          "ACR": 40,
+          "K": 4.4
+        },
+        {
+          "date": "2023-06",
+          "eGFR": 61,
+          "ACR": 60,
+          "K": 4.5
+        },
+        {
+          "date": "2024-06",
+          "eGFR": 52,
+          "ACR": 90,
+          "K": 4.5
+        },
+        {
+          "date": "2025-06",
+          "eGFR": 45,
+          "ACR": 120,
+          "K": 4.6
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "rapid decline ~8.3 mL/min/year (>=5 = rapid progression)",
+        "surface": [
+          {
+            "finding": "statin or statin/ezetimibe indicated and not prescribed",
+            "trigger_threshold": "age 55 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "RAS inhibitor indicated (weak) and not prescribed",
+            "trigger_threshold": "albuminuria A2, diabetes=False (2C)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR 20-45 & ACR<200 (2B)"
+          }
+        ],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P13_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin or statin/ezetimibe",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P13_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A2 (weak, 2C)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P13_A3",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P13_A4",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR 20-45 & ACR<200 (2B)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P13_A5",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "rapid progression",
+            "draft_text": "Re: 55M. Referral for G3a A2 CKD (eGFR 45, ACR 120 mg/g); rapid progression. Diabetes=False. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P14",
+      "risk_tier": "moderate",
+      "demographics": {
+        "age": 72,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [
+        "heart failure"
+      ],
+      "medications": [
+        "ramipril",
+        "atorvastatin",
+        "furosemide"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 55,
+          "ACR": 15,
+          "K": 4.5
+        }
+      ],
+      "expected": {
+        "stage": "G3a A1",
+        "is_ckd": true,
+        "risk_tier": "moderate",
+        "trajectory": "single steady value",
+        "surface": [
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "HF at any ACR"
+          }
+        ],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P14_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "HF at any ACR",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P15",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 33,
+        "sex": "F",
+        "diabetes": false
+      },
+      "context": [
+        "pregnant"
+      ],
+      "medications": [],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 88,
+          "ACR": 340,
+          "K": 4.2
+        }
+      ],
+      "expected": {
+        "stage": "G2 A3",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "single steady value",
+        "surface": [
+          {
+            "finding": "CKD pharmacotherapy (RASi, SGLT2i, statin, finerenone) contraindicated in pregnancy; refer for joint obstetric-nephrology care",
+            "trigger_threshold": "pregnancy contraindication"
+          }
+        ],
+        "suppress": [
+          {
+            "item": "RAS inhibitor initiation",
+            "reason": "contraindicated in pregnancy",
+            "trigger_threshold": "pregnancy contraindication pre-filter"
+          },
+          {
+            "item": "SGLT2 inhibitor initiation",
+            "reason": "contraindicated in pregnancy",
+            "trigger_threshold": "pregnancy contraindication pre-filter"
+          },
+          {
+            "item": "statin initiation",
+            "reason": "contraindicated in pregnancy",
+            "trigger_threshold": "pregnancy contraindication pre-filter"
+          },
+          {
+            "item": "finerenone initiation",
+            "reason": "contraindicated in pregnancy",
+            "trigger_threshold": "pregnancy contraindication pre-filter"
+          }
+        ],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P15_A1",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Joint obstetric-nephrology referral",
+            "trigger_threshold": "albuminuric CKD in pregnancy",
+            "draft_text": "Re: 33F, pregnant. Albuminuric CKD (G2 A3, ACR 340 mg/g). CKD pharmacotherapy contraindicated in pregnancy; grateful for joint obstetric-nephrology assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P16",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 58,
+        "sex": "M",
+        "diabetes": true
+      },
+      "context": [],
+      "medications": [
+        "metformin"
+      ],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 56,
+          "ACR": 120,
+          "K": 4.4
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 55,
+          "ACR": 140,
+          "K": 4.5
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "stable",
+        "surface": [
+          {
+            "finding": "statin or statin/ezetimibe indicated and not prescribed",
+            "trigger_threshold": "age 58 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "RAS inhibitor indicated (strong) and not prescribed",
+            "trigger_threshold": "albuminuria A2, diabetes=True (1B)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "T2D & eGFR>=20"
+          }
+        ],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P16_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin or statin/ezetimibe",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P16_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A2 (strong, 1B)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P16_A3",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P16_A4",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "T2D & eGFR>=20",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P17",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 62,
+        "sex": "F",
+        "diabetes": true
+      },
+      "context": [],
+      "medications": [
+        "ramipril",
+        "metformin"
+      ],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 42,
+          "ACR": 420,
+          "K": 4.5
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 40,
+          "ACR": 450,
+          "K": 4.5
+        }
+      ],
+      "expected": {
+        "stage": "G3b A3",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "statin or statin/ezetimibe indicated and not prescribed",
+            "trigger_threshold": "age 62 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR>=20 & ACR>=200"
+          },
+          {
+            "finding": "Nonsteroidal MRA (finerenone) indicated and not prescribed",
+            "trigger_threshold": "T2D, albuminuria, on max RASi, eGFR>25, K normal (REC 3.8.1, 2A)"
+          }
+        ],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P17_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin or statin/ezetimibe",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P17_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR>=20 & ACR>=200",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P17_A3",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Consider finerenone (with potassium monitoring)",
+            "trigger_threshold": "T2D + albuminuria on RASi, eGFR>25, normal K",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P17_A4",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "significant albuminuria (A3)",
+            "draft_text": "Re: 62F. Referral for G3b A3 CKD (eGFR 40, ACR 450 mg/g); significant albuminuria (A3). Diabetes=True. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P18",
+      "risk_tier": "moderate",
+      "demographics": {
+        "age": 60,
+        "sex": "M",
+        "diabetes": true
+      },
+      "context": [
+        "treated"
+      ],
+      "medications": [
+        "ramipril",
+        "empagliflozin",
+        "atorvastatin",
+        "metformin"
+      ],
+      "labs": [
+        {
+          "date": "2025-04",
+          "eGFR": 50,
+          "ACR": 20,
+          "K": 4.5
+        }
+      ],
+      "expected": {
+        "stage": "G3a A1",
+        "is_ckd": true,
+        "risk_tier": "moderate",
+        "trajectory": "single steady value",
+        "surface": [],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [],
+        "note": "already optimised or no gap; nothing to surface (no nag)"
+      }
+    },
+    {
+      "id": "P19",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 67,
+        "sex": "F",
+        "diabetes": true
+      },
+      "context": [
+        "advanced"
+      ],
+      "medications": [
+        "ramipril",
+        "dapagliflozin",
+        "atorvastatin",
+        "metformin",
+        "finerenone"
+      ],
+      "labs": [
+        {
+          "date": "2024-06",
+          "eGFR": 27,
+          "ACR": 150,
+          "K": 4.7
+        },
+        {
+          "date": "2025-06",
+          "eGFR": 25,
+          "ACR": 160,
+          "K": 4.8
+        }
+      ],
+      "expected": {
+        "stage": "G4 A2",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P19_A1",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "eGFR <30",
+            "draft_text": "Re: 67F. Referral for G4 A2 CKD (eGFR 25, ACR 160 mg/g); eGFR <30. Diabetes=True. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ],
+        "note": "already optimised or no gap; nothing to surface (no nag)"
+      }
+    },
+    {
+      "id": "P20",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 45,
+        "sex": "M",
+        "diabetes": true
+      },
+      "context": [],
+      "medications": [
+        "metformin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 66,
+          "ACR": 340,
+          "K": 4.3
+        }
+      ],
+      "expected": {
+        "stage": "G2 A3",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "single steady value",
+        "surface": [
+          {
+            "finding": "statin indicated and not prescribed",
+            "trigger_threshold": "age 45 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "RAS inhibitor indicated (strong) and not prescribed",
+            "trigger_threshold": "albuminuria A3, diabetes=True (1B)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR>=20 & ACR>=200"
+          }
+        ],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P20_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin",
+            "trigger_threshold": "age 18-49 with CKD + risk factor",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P20_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A3 (strong, 1B)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P20_A3",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P20_A4",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR>=20 & ACR>=200",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P20_A5",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "significant albuminuria (A3)",
+            "draft_text": "Re: 45M. Referral for G2 A3 CKD (eGFR 66, ACR 340 mg/g); significant albuminuria (A3). Diabetes=True. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P21",
+      "risk_tier": "moderate",
+      "demographics": {
+        "age": 40,
+        "sex": "F",
+        "diabetes": false
+      },
+      "context": [
+        "persistent haematuria"
+      ],
+      "medications": [],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 95,
+          "ACR": 60,
+          "K": 4.2
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 93,
+          "ACR": 65,
+          "K": 4.2
+        }
+      ],
+      "expected": {
+        "stage": "G1 A2",
+        "is_ckd": true,
+        "risk_tier": "moderate",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "RAS inhibitor indicated (weak) and not prescribed",
+            "trigger_threshold": "albuminuria A2, diabetes=False (2C)"
+          }
+        ],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P21_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A2 (weak, 2C)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P21_A2",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P22",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 57,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [],
+      "medications": [],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 72,
+          "ACR": 330,
+          "K": 4.4
+        }
+      ],
+      "expected": {
+        "stage": "G2 A3",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "single steady value",
+        "surface": [
+          {
+            "finding": "statin indicated and not prescribed",
+            "trigger_threshold": "age 57 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "RAS inhibitor indicated (strong) and not prescribed",
+            "trigger_threshold": "albuminuria A3, diabetes=False (1B)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR>=20 & ACR>=200"
+          }
+        ],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P22_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P22_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A3 (strong, 1B)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P22_A3",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P22_A4",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR>=20 & ACR>=200",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P22_A5",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "significant albuminuria (A3)",
+            "draft_text": "Re: 57M. Referral for G2 A3 CKD (eGFR 72, ACR 330 mg/g); significant albuminuria (A3). Diabetes=False. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P23",
+      "risk_tier": "moderate",
+      "demographics": {
+        "age": 55,
+        "sex": "F",
+        "diabetes": false
+      },
+      "context": [],
+      "medications": [
+        "amlodipine"
+      ],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 52,
+          "ACR": 18,
+          "K": 4.3
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 50,
+          "ACR": 20,
+          "K": 4.3
+        }
+      ],
+      "expected": {
+        "stage": "G3a A1",
+        "is_ckd": true,
+        "risk_tier": "moderate",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "statin or statin/ezetimibe indicated and not prescribed",
+            "trigger_threshold": "age 55 with CKD (KDIGO 2013 Lipids)"
+          }
+        ],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P23_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin or statin/ezetimibe",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P24",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 60,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [],
+      "medications": [
+        "amlodipine"
+      ],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 40,
+          "ACR": 120,
+          "K": 4.4
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 38,
+          "ACR": 130,
+          "K": 4.5
+        }
+      ],
+      "expected": {
+        "stage": "G3b A2",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "statin or statin/ezetimibe indicated and not prescribed",
+            "trigger_threshold": "age 60 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "RAS inhibitor indicated (weak) and not prescribed",
+            "trigger_threshold": "albuminuria A2, diabetes=False (2C)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR 20-45 & ACR<200 (2B)"
+          }
+        ],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P24_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin or statin/ezetimibe",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P24_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A2 (weak, 2C)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P24_A3",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P24_A4",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR 20-45 & ACR<200 (2B)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P25",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 69,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [],
+      "medications": [
+        "ramipril",
+        "atorvastatin"
+      ],
+      "labs": [
+        {
+          "date": "2024-06",
+          "eGFR": 27,
+          "ACR": 300,
+          "K": 4.8
+        },
+        {
+          "date": "2025-06",
+          "eGFR": 25,
+          "ACR": 320,
+          "K": 4.8
+        }
+      ],
+      "expected": {
+        "stage": "G4 A3",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR>=20 & ACR>=200"
+          }
+        ],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P25_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR>=20 & ACR>=200",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P25_A2",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "eGFR <30; significant albuminuria (A3)",
+            "draft_text": "Re: 69M. Referral for G4 A3 CKD (eGFR 25, ACR 320 mg/g); eGFR <30, significant albuminuria (A3). Diabetes=False. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P26",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 71,
+        "sex": "F",
+        "diabetes": false
+      },
+      "context": [
+        "stage 5 non-dialysis"
+      ],
+      "medications": [
+        "ramipril",
+        "dapagliflozin",
+        "atorvastatin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 13,
+          "ACR": 500,
+          "K": 4.9
+        }
+      ],
+      "expected": {
+        "stage": "G5 A3",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "single steady value",
+        "surface": [],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P26_A1",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "eGFR <30; significant albuminuria (A3)",
+            "draft_text": "Re: 71F. Referral for G5 A3 CKD (eGFR 13, ACR 500 mg/g); eGFR <30, significant albuminuria (A3). Diabetes=False. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ],
+        "note": "already optimised or no gap; nothing to surface (no nag)"
+      }
+    },
+    {
+      "id": "P27",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 68,
+        "sex": "F",
+        "diabetes": false
+      },
+      "context": [],
+      "medications": [],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 50,
+          "ACR": 340,
+          "K": 4.4
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 48,
+          "ACR": 360,
+          "K": 4.4
+        }
+      ],
+      "expected": {
+        "stage": "G3a A3",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "statin or statin/ezetimibe indicated and not prescribed",
+            "trigger_threshold": "age 68 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "RAS inhibitor indicated (strong) and not prescribed",
+            "trigger_threshold": "albuminuria A3, diabetes=False (1B)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR>=20 & ACR>=200"
+          }
+        ],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P27_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin or statin/ezetimibe",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P27_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A3 (strong, 1B)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P27_A3",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P27_A4",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR>=20 & ACR>=200",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P27_A5",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "significant albuminuria (A3)",
+            "draft_text": "Re: 68F. Referral for G3a A3 CKD (eGFR 48, ACR 360 mg/g); significant albuminuria (A3). Diabetes=False. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P28",
+      "risk_tier": "moderate",
+      "demographics": {
+        "age": 52,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [],
+      "medications": [
+        "atorvastatin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 74,
+          "ACR": 90,
+          "K": 4.3
+        }
+      ],
+      "expected": {
+        "stage": "G2 A2",
+        "is_ckd": true,
+        "risk_tier": "moderate",
+        "trajectory": "single steady value",
+        "surface": [
+          {
+            "finding": "RAS inhibitor indicated (weak) and not prescribed",
+            "trigger_threshold": "albuminuria A2, diabetes=False (2C)"
+          }
+        ],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P28_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A2 (weak, 2C)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P28_A2",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P29",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 64,
+        "sex": "M",
+        "diabetes": true
+      },
+      "context": [],
+      "medications": [
+        "ramipril",
+        "dapagliflozin",
+        "atorvastatin",
+        "metformin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 50,
+          "ACR": 120,
+          "K": 4.6
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "single steady value",
+        "surface": [
+          {
+            "finding": "Nonsteroidal MRA (finerenone) indicated and not prescribed",
+            "trigger_threshold": "T2D, albuminuria, on max RASi, eGFR>25, K normal (REC 3.8.1, 2A)"
+          }
+        ],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P29_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Consider finerenone (with potassium monitoring)",
+            "trigger_threshold": "T2D + albuminuria on RASi, eGFR>25, normal K",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P30",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 66,
+        "sex": "F",
+        "diabetes": true
+      },
+      "context": [
+        "fully treated"
+      ],
+      "medications": [
+        "ramipril",
+        "empagliflozin",
+        "finerenone",
+        "atorvastatin",
+        "metformin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 40,
+          "ACR": 330,
+          "K": 4.7
+        }
+      ],
+      "expected": {
+        "stage": "G3b A3",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "single steady value",
+        "surface": [],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P30_A1",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "significant albuminuria (A3)",
+            "draft_text": "Re: 66F. Referral for G3b A3 CKD (eGFR 40, ACR 330 mg/g); significant albuminuria (A3). Diabetes=True. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ],
+        "note": "already optimised or no gap; nothing to surface (no nag)"
+      }
+    },
+    {
+      "id": "P31",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 63,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [],
+      "medications": [
+        "losartan",
+        "atorvastatin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 50,
+          "ACR": 340,
+          "K": 4.5
+        }
+      ],
+      "expected": {
+        "stage": "G3a A3",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "single steady value",
+        "surface": [
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR>=20 & ACR>=200"
+          }
+        ],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P31_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR>=20 & ACR>=200",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P31_A2",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "significant albuminuria (A3)",
+            "draft_text": "Re: 63M. Referral for G3a A3 CKD (eGFR 50, ACR 340 mg/g); significant albuminuria (A3). Diabetes=False. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P32",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 70,
+        "sex": "F",
+        "diabetes": false
+      },
+      "context": [],
+      "medications": [
+        "ramipril",
+        "atorvastatin",
+        "dapagliflozin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 28,
+          "ACR": 180,
+          "K": 4.7
+        }
+      ],
+      "expected": {
+        "stage": "G4 A2",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "single steady value",
+        "surface": [],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P32_A1",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "eGFR <30",
+            "draft_text": "Re: 70F. Referral for G4 A2 CKD (eGFR 28, ACR 180 mg/g); eGFR <30. Diabetes=False. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ],
+        "note": "already optimised or no gap; nothing to surface (no nag)"
+      }
+    },
+    {
+      "id": "P33",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 59,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [
+        "trimethoprim course"
+      ],
+      "medications": [
+        "amlodipine"
+      ],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 52,
+          "ACR": 120,
+          "K": 4.4
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 42,
+          "ACR": 130,
+          "K": 4.5,
+          "acute": true
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "single steady value",
+        "surface": [
+          {
+            "finding": "statin or statin/ezetimibe indicated and not prescribed",
+            "trigger_threshold": "age 59 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "RAS inhibitor indicated (weak) and not prescribed",
+            "trigger_threshold": "albuminuria A2, diabetes=False (2C)"
+          }
+        ],
+        "suppress": [
+          {
+            "item": "recent creatinine rise on trimethoprim",
+            "reason": "pseudo-rise from blocked tubular secretion; not true GFR loss",
+            "trigger_threshold": "suppression rule: trimethoprim/cimetidine pseudo-rise"
+          }
+        ],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P33_A1",
+            "type": "schedule_recheck",
+            "coordination_target": "scheduling",
+            "detail": "Repeat U&E after course completed to confirm return to baseline",
+            "trigger_threshold": "confirm resolution of transient rise",
+            "priority": "low",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "2 weeks after course end"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P33_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin or statin/ezetimibe",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P33_A3",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A2 (weak, 2C)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P33_A4",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P34",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 78,
+        "sex": "F",
+        "diabetes": true
+      },
+      "context": [
+        "frail, low muscle mass"
+      ],
+      "medications": [
+        "metformin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 55,
+          "ACR": 140,
+          "K": 4.3
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "single steady value",
+        "surface": [
+          {
+            "finding": "creatinine-based eGFR likely overestimates true GFR (muscle mass); confirm before staging-driven decisions",
+            "trigger_threshold": "eGFR reliability rule at extremes of muscle mass"
+          }
+        ],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P34_A1",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "Cystatin C-based eGFR",
+            "trigger_threshold": "creatinine-based eGFR unreliable (muscle mass)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "next available"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P34_A2",
+            "type": "defer",
+            "coordination_target": "prescriber",
+            "detail": "Hold staging-driven treatment and referral decisions pending cystatin C result",
+            "trigger_threshold": "true GFR uncertain; avoid acting on unreliable eGFR",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P35",
+      "risk_tier": "moderate",
+      "demographics": {
+        "age": 30,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [
+        "bodybuilder, high muscle mass"
+      ],
+      "medications": [],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 58,
+          "ACR": 8,
+          "K": 4.2
+        }
+      ],
+      "expected": {
+        "stage": "G3a A1",
+        "is_ckd": true,
+        "risk_tier": "moderate",
+        "trajectory": "single steady value",
+        "surface": [
+          {
+            "finding": "creatinine-based eGFR likely underestimates true GFR (muscle mass); confirm before staging-driven decisions",
+            "trigger_threshold": "eGFR reliability rule at extremes of muscle mass"
+          }
+        ],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P35_A1",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "Cystatin C-based eGFR",
+            "trigger_threshold": "creatinine-based eGFR unreliable (muscle mass)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "next available"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P35_A2",
+            "type": "defer",
+            "coordination_target": "prescriber",
+            "detail": "Hold staging-driven treatment and referral decisions pending cystatin C result",
+            "trigger_threshold": "true GFR uncertain; avoid acting on unreliable eGFR",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P36",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 64,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [
+        "recovered AKI"
+      ],
+      "medications": [
+        "amlodipine"
+      ],
+      "labs": [
+        {
+          "date": "2024-06",
+          "eGFR": 50,
+          "ACR": 210,
+          "K": 4.5
+        },
+        {
+          "date": "2025-01",
+          "eGFR": 33,
+          "ACR": 220,
+          "K": 4.9,
+          "acute": true
+        },
+        {
+          "date": "2025-06",
+          "eGFR": 49,
+          "ACR": 215,
+          "K": 4.5
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "stable",
+        "surface": [
+          {
+            "finding": "statin or statin/ezetimibe indicated and not prescribed",
+            "trigger_threshold": "age 64 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "RAS inhibitor indicated (weak) and not prescribed",
+            "trigger_threshold": "albuminuria A2, diabetes=False (2C)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR>=20 & ACR>=200"
+          }
+        ],
+        "suppress": [
+          {
+            "item": "in-hospital eGFR nadir that recovered to baseline",
+            "reason": "resolved AKI; not chronic progression",
+            "trigger_threshold": "suppression rule: resolved AKI"
+          }
+        ],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P36_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin or statin/ezetimibe",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P36_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A2 (weak, 2C)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P36_A3",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P36_A4",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR>=20 & ACR>=200",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P37",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 70,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [],
+      "medications": [],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 40,
+          "ACR": 15,
+          "K": 4.4
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 38,
+          "ACR": 18,
+          "K": 4.4
+        }
+      ],
+      "expected": {
+        "stage": "G3b A1",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "statin or statin/ezetimibe indicated and not prescribed",
+            "trigger_threshold": "age 70 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR 20-45 & ACR<200 (2B)"
+          }
+        ],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P37_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin or statin/ezetimibe",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P37_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR 20-45 & ACR<200 (2B)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P38",
+      "risk_tier": "low",
+      "demographics": {
+        "age": 55,
+        "sex": "F",
+        "diabetes": true
+      },
+      "context": [
+        "diabetic, normal kidney indices"
+      ],
+      "medications": [
+        "metformin",
+        "atorvastatin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 82,
+          "ACR": 12,
+          "K": 4.3
+        }
+      ],
+      "expected": {
+        "stage": "G2 A1",
+        "is_ckd": false,
+        "risk_tier": "low",
+        "trajectory": "single steady value",
+        "surface": [],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [],
+        "note": "not CKD (no eGFR reduction and no damage marker); no CKD action"
+      }
+    },
+    {
+      "id": "P39",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 35,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [],
+      "medications": [],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 96,
+          "ACR": 340,
+          "K": 4.2
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 94,
+          "ACR": 360,
+          "K": 4.2
+        }
+      ],
+      "expected": {
+        "stage": "G1 A3",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "RAS inhibitor indicated (strong) and not prescribed",
+            "trigger_threshold": "albuminuria A3, diabetes=False (1B)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR>=20 & ACR>=200"
+          }
+        ],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P39_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A3 (strong, 1B)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P39_A2",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P39_A3",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR>=20 & ACR>=200",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P39_A4",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "significant albuminuria (A3)",
+            "draft_text": "Re: 35M. Referral for G1 A3 CKD (eGFR 94, ACR 360 mg/g); significant albuminuria (A3). Diabetes=False. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P40",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 58,
+        "sex": "F",
+        "diabetes": false
+      },
+      "context": [
+        "correctly on target"
+      ],
+      "medications": [
+        "ramipril",
+        "atorvastatin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 48,
+          "ACR": 150,
+          "K": 4.5
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "single steady value",
+        "surface": [],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [],
+        "note": "already optimised or no gap; nothing to surface (no nag)"
+      }
+    },
+    {
+      "id": "P41",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 61,
+        "sex": "M",
+        "diabetes": true
+      },
+      "context": [],
+      "medications": [
+        "metformin",
+        "insulin"
+      ],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 38,
+          "ACR": 420,
+          "K": 4.5
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 35,
+          "ACR": 450,
+          "K": 4.5
+        }
+      ],
+      "expected": {
+        "stage": "G3b A3",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "gradual decline ~3.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "statin or statin/ezetimibe indicated and not prescribed",
+            "trigger_threshold": "age 61 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "RAS inhibitor indicated (strong) and not prescribed",
+            "trigger_threshold": "albuminuria A3, diabetes=True (1B)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR>=20 & ACR>=200"
+          }
+        ],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P41_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin or statin/ezetimibe",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P41_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A3 (strong, 1B)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P41_A3",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P41_A4",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR>=20 & ACR>=200",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P41_A5",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "significant albuminuria (A3)",
+            "draft_text": "Re: 61M. Referral for G3b A3 CKD (eGFR 35, ACR 450 mg/g); significant albuminuria (A3). Diabetes=True. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P42",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 60,
+        "sex": "F",
+        "diabetes": false
+      },
+      "context": [
+        "treated"
+      ],
+      "medications": [
+        "ramipril",
+        "dapagliflozin",
+        "atorvastatin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 75,
+          "ACR": 340,
+          "K": 4.5
+        }
+      ],
+      "expected": {
+        "stage": "G2 A3",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "single steady value",
+        "surface": [],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P42_A1",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "significant albuminuria (A3)",
+            "draft_text": "Re: 60F. Referral for G2 A3 CKD (eGFR 75, ACR 340 mg/g); significant albuminuria (A3). Diabetes=False. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ],
+        "note": "already optimised or no gap; nothing to surface (no nag)"
+      }
+    },
+    {
+      "id": "P43",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 66,
+        "sex": "M",
+        "diabetes": true
+      },
+      "context": [
+        "hyperkalaemia"
+      ],
+      "medications": [
+        "ramipril",
+        "metformin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 44,
+          "ACR": 360,
+          "K": 5.8
+        }
+      ],
+      "expected": {
+        "stage": "G3b A3",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "single steady value",
+        "surface": [
+          {
+            "finding": "statin or statin/ezetimibe indicated and not prescribed",
+            "trigger_threshold": "age 66 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR>=20 & ACR>=200"
+          },
+          {
+            "finding": "Finerenone indicated but gated on hyperkalaemia",
+            "trigger_threshold": "K 5.8 > 5.0 - requires normal potassium"
+          }
+        ],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P43_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin or statin/ezetimibe",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P43_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR>=20 & ACR>=200",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P43_A3",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "significant albuminuria (A3)",
+            "draft_text": "Re: 66M. Referral for G3b A3 CKD (eGFR 44, ACR 360 mg/g); significant albuminuria (A3). Diabetes=True. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P44",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 69,
+        "sex": "F",
+        "diabetes": true
+      },
+      "context": [
+        "established SGLT2i, eGFR now low"
+      ],
+      "medications": [
+        "ramipril",
+        "empagliflozin",
+        "atorvastatin",
+        "metformin",
+        "finerenone"
+      ],
+      "labs": [
+        {
+          "date": "2024-06",
+          "eGFR": 24,
+          "ACR": 260,
+          "K": 4.7
+        },
+        {
+          "date": "2025-06",
+          "eGFR": 18,
+          "ACR": 270,
+          "K": 4.8
+        }
+      ],
+      "expected": {
+        "stage": "G4 A2",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "rapid decline ~6.0 mL/min/year (>=5 = rapid progression)",
+        "surface": [],
+        "suppress": [
+          {
+            "item": "eGFR fell below 20 on established SGLT2i",
+            "reason": "reasonable to continue below 20 unless not tolerated or dialysis started",
+            "trigger_threshold": "PP 3.7.1: continue below eGFR 20"
+          }
+        ],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P44_A1",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "eGFR <30; rapid progression",
+            "draft_text": "Re: 69F. Referral for G4 A2 CKD (eGFR 18, ACR 270 mg/g); eGFR <30, rapid progression. Diabetes=True. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P45",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 63,
+        "sex": "M",
+        "diabetes": true
+      },
+      "context": [
+        "intercurrent illness"
+      ],
+      "medications": [
+        "metformin"
+      ],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 58,
+          "ACR": 220,
+          "K": 4.5
+        },
+        {
+          "date": "2025-02",
+          "eGFR": 40,
+          "ACR": 230,
+          "K": 4.8,
+          "acute": true
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 56,
+          "ACR": 225,
+          "K": 4.5
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "statin or statin/ezetimibe indicated and not prescribed",
+            "trigger_threshold": "age 63 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "RAS inhibitor indicated (strong) and not prescribed",
+            "trigger_threshold": "albuminuria A2, diabetes=True (1B)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR>=20 & ACR>=200"
+          }
+        ],
+        "suppress": [
+          {
+            "item": "recent eGFR dip coinciding with acute illness",
+            "reason": "non-steady-state; acute drop, not chronic progression",
+            "trigger_threshold": "suppression rule: exclude non-steady-state values"
+          }
+        ],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P45_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin or statin/ezetimibe",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P45_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A2 (strong, 1B)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P45_A3",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P45_A4",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR>=20 & ACR>=200",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P46",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 72,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [],
+      "medications": [
+        "ramipril",
+        "atorvastatin"
+      ],
+      "labs": [
+        {
+          "date": "2024-06",
+          "eGFR": 24,
+          "ACR": 40,
+          "K": 4.7
+        },
+        {
+          "date": "2025-06",
+          "eGFR": 22,
+          "ACR": 45,
+          "K": 4.7
+        }
+      ],
+      "expected": {
+        "stage": "G4 A2",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "eGFR 20-45 & ACR<200 (2B)"
+          }
+        ],
+        "suppress": [],
+        "referral": true,
+        "proposed_actions": [
+          {
+            "id": "P46_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "eGFR 20-45 & ACR<200 (2B)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P46_A2",
+            "type": "draft_referral",
+            "coordination_target": "nephrology",
+            "detail": "Nephrology referral",
+            "trigger_threshold": "eGFR <30",
+            "draft_text": "Re: 72M. Referral for G4 A2 CKD (eGFR 22, ACR 45 mg/g); eGFR <30. Diabetes=False. Grateful for specialist assessment.",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P47",
+      "risk_tier": "low",
+      "demographics": {
+        "age": 50,
+        "sex": "F",
+        "diabetes": false
+      },
+      "context": [
+        "cimetidine course"
+      ],
+      "medications": [],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 92,
+          "ACR": 10,
+          "K": 4.2
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 74,
+          "ACR": 12,
+          "K": 4.3,
+          "acute": true
+        }
+      ],
+      "expected": {
+        "stage": "G1 A1",
+        "is_ckd": false,
+        "risk_tier": "low",
+        "trajectory": "single steady value",
+        "surface": [],
+        "suppress": [
+          {
+            "item": "recent creatinine rise on cimetidine",
+            "reason": "pseudo-rise from blocked tubular secretion; not true GFR loss",
+            "trigger_threshold": "suppression rule: trimethoprim/cimetidine pseudo-rise"
+          }
+        ],
+        "referral": false,
+        "proposed_actions": [],
+        "note": "not CKD (no eGFR reduction and no damage marker); no CKD action"
+      }
+    },
+    {
+      "id": "P48",
+      "risk_tier": "moderate",
+      "demographics": {
+        "age": 57,
+        "sex": "M",
+        "diabetes": true
+      },
+      "context": [],
+      "medications": [
+        "metformin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 95,
+          "ACR": 120,
+          "K": 4.3
+        }
+      ],
+      "expected": {
+        "stage": "G1 A2",
+        "is_ckd": true,
+        "risk_tier": "moderate",
+        "trajectory": "single steady value",
+        "surface": [
+          {
+            "finding": "statin indicated and not prescribed",
+            "trigger_threshold": "age 57 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "RAS inhibitor indicated (strong) and not prescribed",
+            "trigger_threshold": "albuminuria A2, diabetes=True (1B)"
+          },
+          {
+            "finding": "SGLT2 inhibitor indicated and not prescribed",
+            "trigger_threshold": "T2D & eGFR>=20"
+          }
+        ],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P48_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin",
+            "trigger_threshold": "age >=50 with CKD",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P48_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A2 (strong, 1B)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P48_A3",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P48_A4",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate SGLT2 inhibitor",
+            "trigger_threshold": "T2D & eGFR>=20",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P49",
+      "risk_tier": "high",
+      "demographics": {
+        "age": 48,
+        "sex": "M",
+        "diabetes": false
+      },
+      "context": [
+        "prior myocardial infarction"
+      ],
+      "medications": [
+        "amlodipine"
+      ],
+      "labs": [
+        {
+          "date": "2024-05",
+          "eGFR": 52,
+          "ACR": 120,
+          "K": 4.3
+        },
+        {
+          "date": "2025-05",
+          "eGFR": 50,
+          "ACR": 130,
+          "K": 4.3
+        }
+      ],
+      "expected": {
+        "stage": "G3a A2",
+        "is_ckd": true,
+        "risk_tier": "high",
+        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
+        "surface": [
+          {
+            "finding": "statin or statin/ezetimibe indicated and not prescribed",
+            "trigger_threshold": "age 48 with CKD (KDIGO 2013 Lipids)"
+          },
+          {
+            "finding": "RAS inhibitor indicated (weak) and not prescribed",
+            "trigger_threshold": "albuminuria A2, diabetes=False (2C)"
+          }
+        ],
+        "suppress": [],
+        "referral": false,
+        "proposed_actions": [
+          {
+            "id": "P49_A1",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate statin or statin/ezetimibe",
+            "trigger_threshold": "age 18-49 with CKD + risk factor",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P49_A2",
+            "type": "medication_recommendation",
+            "coordination_target": "prescriber",
+            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
+            "trigger_threshold": "albuminuria A2 (weak, 2C)",
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          },
+          {
+            "id": "P49_A3",
+            "type": "order_lab",
+            "coordination_target": "laboratory",
+            "detail": "U&E at initiation and repeat within 2-4 weeks",
+            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
+            "schedule": {
+              "schedulable": true,
+              "proposed_window": "at initiation and within 2-4 weeks"
+            },
+            "requires_clinician_approval": true,
+            "status": "proposed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P50",
+      "risk_tier": "very_high",
+      "demographics": {
+        "age": 73,
+        "sex": "F",
+        "diabetes": true
+      },
+      "context": [
+        "haemodialysis"
+      ],
+      "medications": [
+        "ramipril",
+        "metformin"
+      ],
+      "labs": [
+        {
+          "date": "2025-05",
+          "eGFR": 9,
+          "ACR": 600,
+          "K": 4.9
+        }
+      ],
+      "expected": {
+        "stage": "G5 A3",
+        "is_ckd": true,
+        "risk_tier": "very_high",
+        "trajectory": "single steady value",
+        "surface": [],
+        "suppress": [
+          {
+            "item": "statin initiation",
+            "reason": "do not initiate statins in dialysis-dependent CKD",
+            "trigger_threshold": "KDIGO 2013 Lipids 2.3.1 (2A)"
+          }
+        ],
+        "referral": false,
+        "proposed_actions": []
+      }
+    }
+  ]
+}
