@@ -82,7 +82,7 @@ The 6.0 stop point is a **[CONV]** operational safety threshold. It must not be 
 
 ### 1.6 Initiation potassium gate (links to the demo)
 
-Before proposing initiation, the core checks the latest potassium against the §1.5 bands. If ≤ 5.0, propose initiation normally. If above, output the **safety-gated** form: "RASi indicated — gated on hyperkalaemia; treat potassium first," never a clean start action. This is the live-demo beat: editing the hero patient's potassium above 5.5 flips the recommendation from "initiate" to "indicated, gated."
+Before proposing RASi initiation, the core checks the latest potassium against the §1.5 bands. If ≤ 5.5, propose initiation (adding potassium-lowering mitigation and closer monitoring when in the 5.1–5.5 band). If > 5.5, output the **safety-gated** form: "RASi indicated — gated on hyperkalaemia; treat potassium first," never a clean start action. This is the live-demo beat: editing the hero patient's potassium above 5.5 flips the recommendation from "initiate" to "indicated, gated." Note: finerenone uses a stricter, drug-specific initiation gate of K > 5.0 (see §4) — do not apply the RASi 5.5 threshold to finerenone.
 
 ### 1.7 Monitoring schedule
 
@@ -117,7 +117,7 @@ function rasi_status(patient):
     indication = rasi_indication(patient.diabetes, patient.albuminuria)  # §1.1 table -> STRONG | WEAK | NONE
     if indication == NONE:
         return NO_ACTION("not indicated")
-    if latest_potassium(patient) > 5.0:           # §1.6 gate
+    if latest_potassium(patient) > 5.5:           # §1.6 RASi gate (finerenone is stricter: >5.0, see §4)
         return GATED("indicated — treat potassium first")
     strength = "hard_gap" if indication == STRONG else "consider"   # STRONG=1B, WEAK=2C
     return PROPOSE(initiate_rasi, strength, schedule_recheck=2_4_weeks)  # §1.7
@@ -161,7 +161,7 @@ TODO for expansion: statin dose-adjustment cautions at low eGFR, transplant-reci
 
 Indication, confirmed against KDIGO 2024: adults with **T2D**, eGFR > 25, **normal serum potassium**, and albuminuria (> 30 mg/g / > 3 mg/mmol) despite maximum tolerated RASi [REC 3.8.1, 2A]. May be added on top of a RASi and an SGLT2i [PP 3.8.2]. Select patients with consistently normal potassium and monitor potassium regularly after initiation [PP 3.8.3].
 
-TODO for expansion: potassium initiation gate (trial initiation used serum K ≤ 4.8 mmol/L in FIDELIO-DKD — [TRIAL], verify), monitoring cadence, and interaction with the shared potassium constraint in §5. Do not gate the non-diabetic hero patient on finerenone. For the pitch, the honest recency note is: the diabetes-specific guidance remains KDIGO 2022, and KDIGO's in-progress focused update to Chapter 3 of the 2024 CKD guideline is examining nsMRA (alongside SGLT2i and GLP-1 receptor agonists) in CKD without diabetes; combination therapy is supported by trial evidence such as CONFIDENCE (finerenone + empagliflozin). Build to 2024; name the direction of travel without asserting an unpublished recommendation.
+Potassium rules (finerenone drug label, verified): do **not** initiate finerenone if serum potassium > 5.0 mmol/L; once on treatment, withhold if potassium > 5.5 mmol/L and restart at a reduced dose only when potassium ≤ 5.0 (the FIDELIO-DKD trial initiated at K ≤ 4.8). This initiation gate (>5.0) is deliberately stricter than the RASi gate (>5.5) in §1.5, because finerenone itself raises potassium. TODO for expansion: monitoring cadence (serum potassium at 4 weeks after initiation and periodically), and interaction with the shared potassium constraint in §5. Do not gate the non-diabetic hero patient on finerenone. For the pitch, the honest recency note is: the diabetes-specific guidance remains KDIGO 2022, and KDIGO's in-progress focused update to Chapter 3 of the 2024 CKD guideline is examining nsMRA (alongside SGLT2i and GLP-1 receptor agonists) in CKD without diabetes; combination therapy is supported by trial evidence such as CONFIDENCE (finerenone + empagliflozin). Build to 2024; name the direction of travel without asserting an unpublished recommendation.
 
 ---
 
