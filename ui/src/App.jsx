@@ -346,7 +346,8 @@ function EHRReview({ patient }) {
                     <div className="card-top"><span className="tag" style={{ background: m.color }}>{m.label}</span>
                       {s.drug && <span className="drug">{s.drug}</span>}</div>
                     <p className="card-body">{s.summary}</p>
-                    <p className="cite">📖 {s.citation}</p>
+                    <a className="cite" href={s.citation.url} target="_blank" rel="noopener noreferrer">
+                      <span className="cite-chip">Source</span>{s.citation.text}</a>
                     {s.type === "gap" && (done
                       ? <p className="done-msg">✓ {done.message}</p>
                       : <button className="act" onClick={() => prescribe(s.drug)}>Prescribe {s.drug}</button>)}
@@ -369,7 +370,8 @@ function EHRReview({ patient }) {
                   <div className="card-top"><span className="tag muted">{SUPPRESS_LABEL[s.type] || s.type}</span>
                     <span className="drug muted">{s.item}</span></div>
                   <p className="card-body muted">{s.reason}</p>
-                  <p className="cite muted">📖 {s.citation}</p>
+                  <a className="cite muted" href={s.citation.url} target="_blank" rel="noopener noreferrer">
+                    <span className="cite-chip">Source</span>{s.citation.text}</a>
                 </div>
               ))}
             </div>

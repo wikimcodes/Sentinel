@@ -38,31 +38,40 @@ MODEL = "claude-opus-4-8"
 # ---------------------------------------------------------------------------
 # Guideline citations — every finding maps to the rule that justifies it
 # ---------------------------------------------------------------------------
+# Primary-source URLs — every citation links to the guideline or trial it rests on,
+# so a clinician can verify the claim in one click rather than trust an unclickable label.
+KDIGO_CKD = "https://kdigo.org/guidelines/ckd-evaluation-and-management/"
+KDIGO_LIPID = "https://kdigo.org/guidelines/lipids/"
+NICE_NG203 = "https://www.nice.org.uk/guidance/ng203"
+DAPA_CKD = "https://doi.org/10.1056/NEJMoa2024816"      # Heerspink et al, DAPA-CKD, NEJM 2020
+FIDELIO_DKD = "https://doi.org/10.1056/NEJMoa2025845"   # Bakris et al, FIDELIO-DKD, NEJM 2020
+
 CITE = {
-    ("trajectory", None): "KDIGO 2024 CKD — sustained eGFR decline ≥5 mL/min/1.73m²/yr defines rapid progression.",
-    ("gap", "SGLT2 inhibitor"): "KDIGO 2024 · DAPA-CKD — SGLT2 inhibitor for albuminuric CKD (ACR ≥200 mg/g), eGFR ≥20.",
-    ("gap", "RAS inhibitor"): "KDIGO 2024 — ACEi/ARB for albuminuric CKD (A2–A3); titrate to max tolerated.",
-    ("gap", "finerenone"): "KDIGO · FIDELIO/FIGARO-DKD — nsMRA for T2D + albuminuric CKD on max RASi, K⁺ normal, eGFR ≥25.",
-    ("gap", "statin"): "KDIGO Lipid — statin for all adults ≥50 with CKD (CV risk reduction).",
-    ("gap_gated", "finerenone"): "KDIGO safety — nsMRA indicated but withhold initiation while K⁺ ≥5.5 mmol/L.",
-    ("gap_gated", "RAS inhibitor"): "KDIGO safety — do not up-titrate RASi while hyperkalaemic (K⁺ ≥5.5).",
-    ("safety", "hyperkalaemia"): "KDIGO — treat K⁺ ≥5.5 mmol/L (diet, review RASi, K-binder) before adding a nsMRA.",
-    ("referral", None): "NICE NG203 · KDIGO — refer if eGFR<30, ACR ≥70 mg/mmol (~620 mg/g), KFRE 5-yr ≥5%, or rapid progression.",
-    ("already_optimised", None): "Already on guideline-directed therapy — no action needed.",
-    ("not_indicated", "SGLT2 inhibitor"): "Below DAPA-CKD threshold (ACR <200 mg/g), non-diabetic — SGLT2i not indicated.",
-    ("not_indicated", "finerenone"): "nsMRA is a T2D-gated indication (KDIGO) — not indicated in non-diabetics.",
-    ("gated_hold", None): "KDIGO safety gate — indicated but held until the blocking parameter is corrected.",
-    ("non_steady_state", None): "KDIGO — exclude non-steady-state eGFR (acute illness / AKI / volume depletion) from progression assessment.",
-    ("resolved_aki", None): "KDIGO — a recovered AKI nadir is not a progression signal.",
-    ("pseudo_rise", None): "Trimethoprim inhibits tubular creatinine secretion — pseudo-rise, not true GFR decline. Confirm with cystatin C.",
-    ("egfr_failure_mode", None): "KDIGO — creatinine-based eGFR unreliable at extremes of muscle mass; confirm with cystatin C.",
-    ("no_progression", None): "eGFR slope <5 mL/min/1.73m²/yr — not rapid progression (KDIGO).",
-    ("no_referral", None): "No KDIGO/NICE nephrology-referral criterion met.",
-    ("not_ckd", None): "KDIGO CKD definition not met (no eGFR<60 and no persistent damage marker).",
+    ("trajectory", None): ("KDIGO 2024 CKD — sustained eGFR decline ≥5 mL/min/1.73m²/yr defines rapid progression.", KDIGO_CKD),
+    ("gap", "SGLT2 inhibitor"): ("KDIGO 2024 · DAPA-CKD — SGLT2 inhibitor for albuminuric CKD (ACR ≥200 mg/g), eGFR ≥20.", DAPA_CKD),
+    ("gap", "RAS inhibitor"): ("KDIGO 2024 — ACEi/ARB for albuminuric CKD (A2–A3); titrate to max tolerated.", KDIGO_CKD),
+    ("gap", "finerenone"): ("KDIGO · FIDELIO/FIGARO-DKD — nsMRA for T2D + albuminuric CKD on max RASi, K⁺ normal, eGFR ≥25.", FIDELIO_DKD),
+    ("gap", "statin"): ("KDIGO Lipid — statin for all adults ≥50 with CKD (CV risk reduction).", KDIGO_LIPID),
+    ("gap_gated", "finerenone"): ("KDIGO safety — nsMRA indicated but withhold initiation while K⁺ ≥5.5 mmol/L.", FIDELIO_DKD),
+    ("gap_gated", "RAS inhibitor"): ("KDIGO safety — do not up-titrate RASi while hyperkalaemic (K⁺ ≥5.5).", KDIGO_CKD),
+    ("safety", "hyperkalaemia"): ("KDIGO — treat K⁺ ≥5.5 mmol/L (diet, review RASi, K-binder) before adding a nsMRA.", KDIGO_CKD),
+    ("referral", None): ("NICE NG203 · KDIGO — refer if eGFR<30, ACR ≥70 mg/mmol (~620 mg/g), KFRE 5-yr ≥5%, or rapid progression.", NICE_NG203),
+    ("already_optimised", None): ("Already on guideline-directed therapy — no action needed.", KDIGO_CKD),
+    ("not_indicated", "SGLT2 inhibitor"): ("Below DAPA-CKD threshold (ACR <200 mg/g), non-diabetic — SGLT2i not indicated.", DAPA_CKD),
+    ("not_indicated", "finerenone"): ("nsMRA is a T2D-gated indication (KDIGO) — not indicated in non-diabetics.", FIDELIO_DKD),
+    ("gated_hold", None): ("KDIGO safety gate — indicated but held until the blocking parameter is corrected.", KDIGO_CKD),
+    ("non_steady_state", None): ("KDIGO — exclude non-steady-state eGFR (acute illness / AKI / volume depletion) from progression assessment.", KDIGO_CKD),
+    ("resolved_aki", None): ("KDIGO — a recovered AKI nadir is not a progression signal.", KDIGO_CKD),
+    ("pseudo_rise", None): ("Trimethoprim inhibits tubular creatinine secretion — pseudo-rise, not true GFR decline. Confirm with cystatin C.", KDIGO_CKD),
+    ("egfr_failure_mode", None): ("KDIGO — creatinine-based eGFR unreliable at extremes of muscle mass; confirm with cystatin C.", KDIGO_CKD),
+    ("no_progression", None): ("eGFR slope <5 mL/min/1.73m²/yr — not rapid progression (KDIGO).", KDIGO_CKD),
+    ("no_referral", None): ("No KDIGO/NICE nephrology-referral criterion met.", NICE_NG203),
+    ("not_ckd", None): ("KDIGO CKD definition not met (no eGFR<60 and no persistent damage marker).", KDIGO_CKD),
 }
 def cite(item):
     key = item.get("drug") or item.get("item")
-    return CITE.get((item["type"], key)) or CITE.get((item["type"], None)) or "KDIGO 2024 CKD guideline."
+    text, url = CITE.get((item["type"], key)) or CITE.get((item["type"], None)) or ("KDIGO 2024 CKD guideline.", KDIGO_CKD)
+    return {"text": text, "url": url}
 
 
 # ---------------------------------------------------------------------------

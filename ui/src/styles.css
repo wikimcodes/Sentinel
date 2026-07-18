@@ -214,7 +214,12 @@ h1 { font-size: 27px; } h2 { font-size: 26px; }
 .drug { font-weight: 600; font-size: 13.5px; }
 .card-body { margin: 0; font-size: 13.5px; line-height: 1.45; }
 .muted { color: var(--text-dim); }
-.cite { margin: 8px 0 0; font-size: 12px; color: var(--text-dim); background: var(--surface-2); border-radius: 6px; padding: 6px 9px; }
+.cite { display: flex; align-items: baseline; gap: 8px; margin: 8px 0 0; font-size: 12px; line-height: 1.4;
+  color: var(--text-dim); background: var(--surface-2); border-radius: 6px; padding: 6px 9px;
+  text-decoration: none; border: 1px solid transparent; transition: border-color .12s, background .12s; }
+.cite:hover { border-color: var(--accent); background: var(--accent-soft); }
+.cite-chip { flex-shrink: 0; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
+  color: var(--accent); background: var(--accent-soft); border-radius: 5px; padding: 2px 6px; }
 .card.suppress .cite { background: var(--surface); }
 
 .act { margin-top: 10px; background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
