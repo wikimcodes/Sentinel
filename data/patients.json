@@ -1,7 +1,7 @@
 {
   "meta": {
     "name": "Sentinel \u2014 Wiki golden set (docs/sentinel_demo_patients_50), app schema",
-    "n": 51,
+    "n": 50,
     "note": "records from Wiki; expected computed by core"
   },
   "patients": [
@@ -4368,8 +4368,8 @@
           "potassium_mmol_l": 4.5,
           "creatinine_mg_dl": 1.6,
           "flags": [
-            "trimethoprim_course",
-            "acute_illness"
+            "acute_illness",
+            "trimethoprim_course"
           ]
         }
       ],
@@ -5326,192 +5326,6 @@
       }
     },
     {
-      "id": "P45",
-      "name": "Edward Boyd",
-      "age": 63,
-      "sex": "M",
-      "diabetes": true,
-      "problems": [
-        "intercurrent illness"
-      ],
-      "labs": [
-        {
-          "date": "2024-05-01",
-          "egfr": 58,
-          "acr_mg_g": 220,
-          "potassium_mmol_l": 4.5,
-          "creatinine_mg_dl": 1.16
-        },
-        {
-          "date": "2025-02-01",
-          "egfr": 40,
-          "acr_mg_g": 230,
-          "potassium_mmol_l": 4.8,
-          "creatinine_mg_dl": 1.68,
-          "flags": [
-            "acute_illness"
-          ]
-        },
-        {
-          "date": "2025-05-01",
-          "egfr": 56,
-          "acr_mg_g": 225,
-          "potassium_mmol_l": 4.5,
-          "creatinine_mg_dl": 1.2
-        }
-      ],
-      "medications": [
-        {
-          "name": "metformin",
-          "dose": "1 g",
-          "class": "biguanide"
-        }
-      ],
-      "comorbidities": [
-        "Type 2 diabetes mellitus",
-        "Hypertension",
-        "Chronic kidney disease"
-      ],
-      "encounters": [
-        {
-          "date": "2025-05-01",
-          "type": "CKD annual review",
-          "summary": "Bloods and urine ACR checked; medications reviewed."
-        },
-        {
-          "date": "2025-02-01",
-          "type": "Hospital admission",
-          "summary": "Acute illness \u2014 non-steady-state bloods (excluded from trend)."
-        }
-      ],
-      "source": "wiki",
-      "wiki_expected": {
-        "stage": "G3a A2",
-        "is_ckd": true,
-        "risk_tier": "high",
-        "trajectory": "gradual decline ~2.0 mL/min/year (sub-rapid)",
-        "surface": [
-          {
-            "finding": "statin or statin/ezetimibe indicated and not prescribed",
-            "trigger_threshold": "age 63 with CKD (KDIGO 2013 Lipids)"
-          },
-          {
-            "finding": "RAS inhibitor indicated (strong) and not prescribed",
-            "trigger_threshold": "albuminuria A2, diabetes=True (1B)"
-          },
-          {
-            "finding": "SGLT2 inhibitor indicated and not prescribed",
-            "trigger_threshold": "eGFR>=20 & ACR>=200"
-          }
-        ],
-        "suppress": [
-          {
-            "item": "recent eGFR dip coinciding with acute illness",
-            "reason": "non-steady-state; acute drop, not chronic progression",
-            "trigger_threshold": "suppression rule: exclude non-steady-state values"
-          }
-        ],
-        "referral": false,
-        "proposed_actions": [
-          {
-            "id": "P45_A1",
-            "type": "medication_recommendation",
-            "coordination_target": "prescriber",
-            "detail": "Initiate statin or statin/ezetimibe",
-            "trigger_threshold": "age >=50 with CKD",
-            "requires_clinician_approval": true,
-            "status": "proposed"
-          },
-          {
-            "id": "P45_A2",
-            "type": "medication_recommendation",
-            "coordination_target": "prescriber",
-            "detail": "Initiate RAS inhibitor (ACEi or ARB), titrate to maximum tolerated",
-            "trigger_threshold": "albuminuria A2 (strong, 1B)",
-            "requires_clinician_approval": true,
-            "status": "proposed"
-          },
-          {
-            "id": "P45_A3",
-            "type": "order_lab",
-            "coordination_target": "laboratory",
-            "detail": "U&E at initiation and repeat within 2-4 weeks",
-            "trigger_threshold": "RASi initiation monitoring (PP 3.6.2)",
-            "schedule": {
-              "schedulable": true,
-              "proposed_window": "at initiation and within 2-4 weeks"
-            },
-            "requires_clinician_approval": true,
-            "status": "proposed"
-          },
-          {
-            "id": "P45_A4",
-            "type": "medication_recommendation",
-            "coordination_target": "prescriber",
-            "detail": "Initiate SGLT2 inhibitor",
-            "trigger_threshold": "eGFR>=20 & ACR>=200",
-            "requires_clinician_approval": true,
-            "status": "proposed"
-          }
-        ]
-      },
-      "expected": {
-        "ckd": true,
-        "stage": "G3a A2",
-        "risk_tier": "orange",
-        "surface": [
-          {
-            "type": "gap",
-            "drug": "RAS inhibitor",
-            "priority": 2,
-            "summary": "Albuminuric CKD (A2, diabetic) \u2014 RAS inhibitor indicated, not prescribed.",
-            "strength": "strong"
-          },
-          {
-            "type": "gap",
-            "drug": "SGLT2 inhibitor",
-            "priority": 2,
-            "summary": "Albuminuric CKD (ACR 225 >= 200), eGFR 56 (>= 20) \u2014 SGLT2 inhibitor indicated, not prescribed.",
-            "strength": "strong"
-          },
-          {
-            "type": "gap",
-            "drug": "statin",
-            "priority": 3,
-            "summary": "CKD, age 63 \u2014 statin indicated for CV-risk reduction, not prescribed."
-          }
-        ],
-        "suppress": [
-          {
-            "type": "non_steady_state",
-            "item": "eGFR dip on 2025-02-01",
-            "reason": "Coincided with acute illness \u2014 non-steady-state, not progression."
-          },
-          {
-            "type": "resolved_aki",
-            "item": "trajectory",
-            "reason": "Nadir recovered to baseline \u2014 trajectory stable."
-          },
-          {
-            "type": "no_referral",
-            "item": "referral",
-            "reason": "No referral criterion met (KFRE 0.5%) \u2014 do not escalate."
-          }
-        ],
-        "kfre_5yr_pct": 0.5
-      },
-      "trigger": {
-        "date": "2025-06-06",
-        "event": "New urine ACR result"
-      },
-      "summary": {
-        "latest_egfr": 56,
-        "risk_tier": "high",
-        "action_count": 4,
-        "needs_attention": true
-      }
-    },
-    {
       "id": "P49",
       "name": "Doris Wade",
       "age": 48,
@@ -5680,8 +5494,8 @@
           "potassium_mmol_l": 4.4,
           "creatinine_mg_dl": 0.95,
           "flags": [
-            "trimethoprim_course",
-            "acute_illness"
+            "acute_illness",
+            "trimethoprim_course"
           ]
         }
       ],
@@ -6564,8 +6378,8 @@
           "potassium_mmol_l": 4.3,
           "creatinine_mg_dl": 0.81,
           "flags": [
-            "trimethoprim_course",
-            "acute_illness"
+            "acute_illness",
+            "trimethoprim_course"
           ]
         }
       ],
