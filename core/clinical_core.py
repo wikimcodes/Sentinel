@@ -19,14 +19,16 @@ from datetime import date
 # THRESHOLDS — the contract. Nothing here may live in the model.
 # ---------------------------------------------------------------------------
 RAPID_SLOPE = 5.0        # mL/min/1.73m^2 per year decline -> rapid progression
-K_GATE = 5.5             # serum K+ >= this gates RASi up-titration / nsMRA start
-SGLT2_ACR = 200          # mg/g — SGLT2i albuminuria threshold (DAPA-CKD)
+K_GATE = 5.5             # serum K+ > this gates RASi initiation / up-titration (§1.6)
+FINERENONE_K_GATE = 5.0  # serum K+ > this: do NOT initiate finerenone (stricter, §4)
+SGLT2_ACR = 200          # mg/g — SGLT2i albuminuria threshold (DAPA-CKD, 1A)
+SGLT2_EGFR_2B = 45       # eGFR 20-45 with ACR<200 -> SGLT2i (2B)
 ALBUMINURIA = 30         # mg/g — A2 / damage-marker threshold
 A3 = 300                 # mg/g — A3 threshold
-REFERRAL_ACR = 620       # mg/g ~= 70 mg/mmol (NICE NG203 heavy-albuminuria referral)
+REFERRAL_ACR = 300       # mg/g — refer on A3 (severe albuminuria) per Wiki spec §referral
 STATIN_AGE = 50
 FINERENONE_EGFR = 25
-KFRE_REFERRAL = 0.05     # 5-yr kidney-failure risk
+KFRE_REFERRAL = 0.03     # 5-yr kidney-failure risk (Wiki spec: refer at 3-5%)
 MG_G_PER_MG_MMOL = 8.84
 
 
@@ -114,43 +116,91 @@ def kfre_5yr_risk(age: float, sex: str, egfr: float, acr_mg_g: float) -> float:
 def _on_class(meds, classes):
     return any(m["class"] in classes for m in meds)
 
+def _cvd_risk(patient) -> bool:
+    txt = " ".join(list(patient.get("problems", [])) + list(patient.get("comorbidities", []))).lower()
+    return any(w in txt for w in ["myocardial", "ischaemic heart", "coronary", "stroke", "revascular"])
+
 def evaluate_medications(patient: dict) -> list:
-    """For each guideline drug return {drug, status, reason}. status in
-    {gap, gated, optimised, not_indicated}."""
+    """For each guideline drug return {drug, status, reason, [strength]}. status in
+    {gap, gated, optimised, not_indicated, contraindicated, pending_cystatin}."""
     labs = sorted(patient["labs"], key=lambda l: l["date"])
     lab = labs[-1]
     egfr, acr, k = lab["egfr"], lab["acr_mg_g"], lab["potassium_mmol_l"]
     dm = patient["diabetes"]; age = patient["age"]; meds = patient["medications"]
     on_rasi = _on_class(meds, {"ACEi", "ARB"})
     ckd = meets_ckd_definition(egfr, acr, patient.get("haematuria"), patient.get("structural_marker"))
+    a3 = acr >= A3
+    pregnant = bool(patient.get("pregnant")); dialysis = bool(patient.get("dialysis"))
+    egfr_unreliable = "low_muscle_mass" in set(lab.get("flags", []))
     out = []
+    def add(drug, status, reason, **kw):
+        out.append({"drug": drug, "status": status, "reason": reason, **kw})
 
-    def classify(drug, indicated, already, gate_blocked, not_ind_reason=None):
-        if indicated and already:
-            out.append({"drug": drug, "status": "optimised", "reason": f"Already on {drug}."})
-        elif indicated and gate_blocked:
-            out.append({"drug": drug, "status": "gated", "reason": f"Indicated but gated on K+ {k} (>= {K_GATE})."})
-        elif indicated:
-            out.append({"drug": drug, "status": "gap", "reason": f"{drug} indicated and not prescribed."})
-        elif not_ind_reason:
-            out.append({"drug": drug, "status": "not_indicated", "reason": not_ind_reason})
+    # RAS inhibitor — §1.1 strong/weak by diabetes x albuminuria
+    rasi_strength = ("strong" if (a3 and not dm) or (acr >= ALBUMINURIA and dm)
+                     else "weak" if (ALBUMINURIA <= acr < A3 and not dm) else None)
+    if pregnant:
+        add("RAS inhibitor", "contraindicated", "Fetotoxic — contraindicated in pregnancy (§1.2).")
+    elif dialysis or rasi_strength is None:
+        add("RAS inhibitor", "not_indicated",
+            "Under dialysis care — not a between-visit gap." if dialysis
+            else "A1 albuminuria — no RASi indication without a specific reason.")
+    elif on_rasi:
+        add("RAS inhibitor", "optimised", "Already on a RAS inhibitor.")
+    elif egfr_unreliable:
+        add("RAS inhibitor", "pending_cystatin", "Indicated, but eGFR unreliable (muscle mass) — confirm with cystatin C before acting.")
+    elif k > K_GATE:
+        add("RAS inhibitor", "gated", f"Indicated but gated on K+ {k} (> {K_GATE}).")
+    else:
+        add("RAS inhibitor", "gap",
+            f"Albuminuric CKD ({'A3' if a3 else 'A2'}, {'diabetic' if dm else 'non-diabetic'}) — RAS inhibitor indicated, not prescribed.",
+            strength=rasi_strength)
 
-    # RAS inhibitor
-    classify("RAS inhibitor", acr >= ALBUMINURIA, on_rasi,
-             acr >= ALBUMINURIA and not on_rasi and k >= K_GATE)
-    # SGLT2 inhibitor
-    sglt2_ind = egfr >= 20 and (acr >= SGLT2_ACR or (dm and ckd) or patient.get("heart_failure"))
-    classify("SGLT2 inhibitor", sglt2_ind, _on_class(meds, {"SGLT2i"}), False,
-             not_ind_reason=(f"ACR {acr} (< {SGLT2_ACR}), non-diabetic, no HF — not indicated."
-                             if ALBUMINURIA <= acr < SGLT2_ACR and not dm else None))
-    # Finerenone (nsMRA) — diabetes-gated
+    # SGLT2 inhibitor — 1A (ACR>=200 / HF / T2D+CKD); 2B (eGFR 20-45)
+    sglt2_ind = egfr >= 20 and (acr >= SGLT2_ACR or (dm and ckd) or patient.get("heart_failure") or egfr <= SGLT2_EGFR_2B)
+    sglt2_weak = sglt2_ind and not (acr >= SGLT2_ACR or (dm and ckd) or patient.get("heart_failure"))
+    if pregnant:
+        add("SGLT2 inhibitor", "contraindicated", "Avoided in pregnancy (§1.2).")
+    elif dialysis:
+        add("SGLT2 inhibitor", "not_indicated", "Dialysis-dependent — not applicable.")
+    elif not sglt2_ind:
+        if ALBUMINURIA <= acr < SGLT2_ACR and not dm:
+            add("SGLT2 inhibitor", "not_indicated", f"ACR {acr} (< {SGLT2_ACR}), non-diabetic, eGFR {egfr} > 45, no HF — not indicated.")
+    elif _on_class(meds, {"SGLT2i"}):
+        add("SGLT2 inhibitor", "optimised", "Already on an SGLT2 inhibitor.")
+    elif egfr_unreliable:
+        add("SGLT2 inhibitor", "pending_cystatin", "Indicated, but confirm true eGFR with cystatin C first.")
+    else:
+        add("SGLT2 inhibitor", "gap",
+            (f"Albuminuric CKD (ACR {acr} >= {SGLT2_ACR}), eGFR {egfr} (>= 20)" if acr >= SGLT2_ACR
+             else f"CKD, eGFR {egfr} (20-45, 2B)") + " — SGLT2 inhibitor indicated, not prescribed.",
+            strength="weak" if sglt2_weak else "strong")
+
+    # Finerenone (nsMRA) — T2D-gated, stricter K gate (§4)
     fin_ind = dm and ckd and acr >= ALBUMINURIA and on_rasi and egfr >= FINERENONE_EGFR
-    classify("finerenone", fin_ind, _on_class(meds, {"nsMRA"}),
-             fin_ind and not _on_class(meds, {"nsMRA"}) and k >= K_GATE,
-             not_ind_reason=("Non-diabetic — nsMRA is a T2D-gated indication; do NOT surface."
-                             if (not dm and acr >= ALBUMINURIA) else None))
-    # Statin
-    classify("statin", age >= STATIN_AGE and ckd, _on_class(meds, {"statin"}), False)
+    if pregnant:
+        add("finerenone", "contraindicated", "Avoided in pregnancy (§1.2).")
+    elif not dm and acr >= ALBUMINURIA:
+        add("finerenone", "not_indicated", "Non-diabetic — nsMRA is a T2D-gated indication; do NOT surface.")
+    elif fin_ind and not dialysis:
+        if _on_class(meds, {"nsMRA"}):
+            add("finerenone", "optimised", "Already on finerenone.")
+        elif k > FINERENONE_K_GATE:
+            add("finerenone", "gated", f"Indicated but K+ {k} (> {FINERENONE_K_GATE}) — stricter nsMRA gate; treat potassium first.")
+        else:
+            add("finerenone", "gap", f"T2D + albuminuric CKD on RASi, K+ {k} normal, eGFR {egfr} (>= {FINERENONE_EGFR}) — finerenone indicated, not prescribed.")
+
+    # Statin — age>=50 with CKD; 18-49 with CKD + a risk factor; not on dialysis
+    statin_ind = ckd and (age >= STATIN_AGE or (18 <= age < STATIN_AGE and (dm or _cvd_risk(patient))))
+    if pregnant:
+        add("statin", "contraindicated", "Avoided in pregnancy (§1.2).")
+    elif dialysis:
+        add("statin", "not_indicated", "Dialysis-dependent — do not initiate a statin (KDIGO 2A).")
+    elif statin_ind:
+        if _on_class(meds, {"statin"}):
+            add("statin", "optimised", "Already on a statin.")
+        else:
+            add("statin", "gap", f"CKD, age {age}{' + CV risk' if age < STATIN_AGE else ''} — statin indicated for CV-risk reduction, not prescribed.")
     return out
 
 
@@ -163,10 +213,12 @@ def referral_recommendation(patient: dict) -> dict:
     egfr, acr = lab["egfr"], lab["acr_mg_g"]
     kfre = kfre_5yr_risk(patient["age"], patient["sex"], egfr, acr)
     rapid = egfr_trajectory(patient["labs"])["rapid"]
+    if patient.get("dialysis"):    # already under specialist renal care
+        return {"refer": False, "reasons": [], "kfre_5yr_pct": round(kfre * 100, 1)}
     reasons = []
     if egfr < 30: reasons.append(f"eGFR {egfr} < 30")
-    if acr >= REFERRAL_ACR: reasons.append(f"ACR {acr} >= {REFERRAL_ACR} mg/g")
-    if kfre >= KFRE_REFERRAL: reasons.append(f"KFRE 5-yr {kfre*100:.1f}% >= 5%")
+    if acr >= REFERRAL_ACR: reasons.append(f"severe albuminuria (ACR {acr} >= {REFERRAL_ACR} mg/g, A3)")
+    if kfre >= KFRE_REFERRAL: reasons.append(f"KFRE 5-yr {kfre*100:.1f}% (>= 3%)")
     if rapid: reasons.append("sustained rapid progression")
     return {"refer": bool(reasons), "reasons": reasons, "kfre_5yr_pct": round(kfre * 100, 1)}
 
@@ -185,9 +237,21 @@ def review_patient(patient: dict) -> dict:
         g, a = gfr_category(egfr), acr_category(acr)
         return {"ckd": False, "stage": None, "risk_tier": None, "surface": [],
                 "suppress": [{"type": "not_ckd", "item": "patient",
-                              "reason": f"{g} {a} with no damage marker — does not meet the CKD definition gate."}]}
+                              "reason": f"{g} {a} with no damage marker — does not meet the CKD definition gate."}],
+                "kfre_5yr_pct": round(kfre_5yr_risk(patient["age"], patient["sex"], egfr, acr) * 100, 1)}
 
     st = stage_patient(egfr, acr)
+    kfre_pct = round(kfre_5yr_risk(patient["age"], patient["sex"], egfr, acr) * 100, 1)
+
+    # Pregnancy: all CKD pharmacotherapy contraindicated; joint obstetric-nephrology referral.
+    if patient.get("pregnant"):
+        surface = [{"type": "referral", "priority": 1,
+                    "summary": "Refer for joint obstetric-nephrology care — all CKD pharmacotherapy (RASi, SGLT2i, statin, finerenone) is contraindicated in pregnancy."}]
+        suppress = [{"type": "not_indicated", "item": m["drug"], "reason": m["reason"]}
+                    for m in evaluate_medications(patient) if m["status"] == "contraindicated"]
+        return {"ckd": True, "stage": st["stage"], "risk_tier": st["risk_tier"],
+                "surface": surface, "suppress": suppress, "kfre_5yr_pct": kfre_pct}
+
     surface, suppress = [], []
 
     # confounder suppressions
@@ -219,15 +283,20 @@ def review_patient(patient: dict) -> dict:
 
     # medications
     for m in evaluate_medications(patient):
-        if m["status"] == "gap":
-            surface.append({"type": "gap", "drug": m["drug"], "priority": 2 if m["drug"] != "statin" else 3,
-                            "summary": m["reason"]})
-        elif m["status"] == "gated":
+        s = m["status"]
+        if s == "gap":
+            item = {"type": "gap", "drug": m["drug"], "priority": 2 if m["drug"] != "statin" else 3,
+                    "summary": m["reason"]}
+            if "strength" in m: item["strength"] = m["strength"]
+            surface.append(item)
+        elif s == "gated":
             surface.append({"type": "gap_gated", "drug": m["drug"], "priority": 1, "summary": m["reason"]})
             suppress.append({"type": "gated_hold", "item": m["drug"], "reason": m["reason"]})
-        elif m["status"] == "optimised":
+        elif s == "optimised":
             suppress.append({"type": "already_optimised", "item": m["drug"], "reason": m["reason"]})
-        elif m["status"] == "not_indicated":
+        elif s == "pending_cystatin":
+            suppress.append({"type": "gated_hold", "item": m["drug"], "reason": m["reason"]})
+        elif s in ("not_indicated", "contraindicated"):
             suppress.append({"type": "not_indicated", "item": m["drug"], "reason": m["reason"]})
 
     # hyperkalaemia as a first-class safety item

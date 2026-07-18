@@ -87,9 +87,11 @@ def score(predictor, patients):
         X_total_expected += len(exp_x)
 
         exact = (exp_s == pred_s)
-        jt = p["tags"]["jtbd"]; pe = p["tags"]["persona"]
-        jtbd_pass[jt][0] += exact; jtbd_pass[jt][1] += 1
-        persona_pass[pe][0] += exact; persona_pass[pe][1] += 1
+        tags = p.get("tags")
+        if tags:
+            jt = tags["jtbd"]; pe = tags["persona"]
+            jtbd_pass[jt][0] += exact; jtbd_pass[jt][1] += 1
+            persona_pass[pe][0] += exact; persona_pass[pe][1] += 1
         if pred.get("ckd", exp["ckd"]) == exp["ckd"]:
             ckd_correct += 1
 

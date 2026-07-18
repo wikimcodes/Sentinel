@@ -37,26 +37,6 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const sortedLabs = (p) => [...p.labs].sort((a, b) => a.date.localeCompare(b.date));
 const topLine = (p) => (!p.expected.ckd ? "Not CKD" : p.expected.surface.length ? p.expected.surface[0].summary : "Reviewed — no action");
 
-// ---------------------------------------------------------------------------
-function Sparkline({ values, flags, thresholds, lo, hi }) {
-  const W = 96, H = 26, P = 3;
-  const min = Math.min(lo, ...values), max = Math.max(hi, ...values);
-  const x = (i) => P + (values.length === 1 ? 0.5 : i / (values.length - 1)) * (W - 2 * P);
-  const y = (v) => P + (1 - (v - min) / (max - min || 1)) * (H - 2 * P);
-  const steady = values.map((v, i) => (flags[i] ? null : `${x(i)},${y(v)}`)).filter(Boolean).join(" ");
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="mini">
-      {(thresholds || []).map((t) => t >= min && t <= max && (
-        <line key={t} className="mini-grid" x1={P} x2={W - P} y1={y(t)} y2={y(t)} />
-      ))}
-      <polyline className="mini-line" points={steady} fill="none" />
-      {values.map((v, i) => (
-        <circle key={i} cx={x(i)} cy={y(v)} r={flags[i] ? 2.6 : 2.2} className={flags[i] ? "mini-flag" : "mini-pt"} />
-      ))}
-    </svg>
-  );
-}
-
 // SystmOne-style investigations grid: rows = tests, columns = dates.
 function ResultsTable({ labs, editing, onEdit, onDate, onAddTest, onToggleEdit, onTrend }) {
   const lastIdx = labs.length - 1;
@@ -78,7 +58,6 @@ function ResultsTable({ labs, editing, onEdit, onDate, onAddTest, onToggleEdit, 
             <tr>
               <th className="an">Investigation</th>
               <th className="ref">Reference</th>
-              <th className="trend">Trend</th>
               {labs.map((l, i) => (
                 <th key={i} className={i === lastIdx ? "col latest-h" : "col"}>
                   {editing
@@ -86,6 +65,7 @@ function ResultsTable({ labs, editing, onEdit, onDate, onAddTest, onToggleEdit, 
                     : <>{fmtDate(l.date)}{flaggedCol[i] && <span className="warn-flag" title="confounded — excluded from slope">⚠</span>}</>}
                 </th>
               ))}
+              <th className="trend-h" />
             </tr>
           </thead>
           <tbody>
@@ -93,10 +73,6 @@ function ResultsTable({ labs, editing, onEdit, onDate, onAddTest, onToggleEdit, 
               <tr key={a.key}>
                 <td className="an"><strong>{a.label}</strong><span className="unit">{a.unit}</span></td>
                 <td className="ref">{a.ref}</td>
-                <td className="trend">
-                  <Sparkline values={labs.map((l) => l[a.key])} flags={flaggedCol} thresholds={a.key === "egfr" ? [30, 60] : []} lo={a.lo} hi={a.hi} />
-                  <button className="trend-btn" onClick={() => onTrend(a.key)}>See trend ↗</button>
-                </td>
                 {labs.map((l, i) => {
                   const v = l[a.key];
                   const fl = a.flag(v);
@@ -108,6 +84,9 @@ function ResultsTable({ labs, editing, onEdit, onDate, onAddTest, onToggleEdit, 
                     </td>
                   );
                 })}
+                <td className="trend-cell">
+                  <button className="trend-btn" onClick={() => onTrend(a.key)}>See trend ↗</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -212,6 +191,7 @@ function EHRReview({ patient }) {
   const [refLoading, setRefLoading] = useState(false);
   const [prescribed, setPrescribed] = useState([]);
   const [trendKey, setTrendKey] = useState(null);
+  const [live, setLive] = useState(false);
 
   const t = TIER[tierOf(patient)];
 
@@ -232,7 +212,7 @@ function EHRReview({ patient }) {
     setPhase("analyzing"); setResult(null); setSteps(0); setReferral(null); setPrescribed([]); setStale(false);
     const ordered = [...labs].sort((a, b) => a.date.localeCompare(b.date));
     const r = await fetch("/api/review", { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ patient_id: patient.id, labs: ordered }) }).then((x) => x.json());
+      body: JSON.stringify({ patient_id: patient.id, labs: ordered, live }) }).then((x) => x.json());
     setResult(r);
     for (let i = 1; i <= r.trace.length; i++) { await sleep(360); setSteps(i); }
     await sleep(240);
@@ -314,22 +294,27 @@ function EHRReview({ patient }) {
           <span className="band-desc">between-visit review · agent augmentation over the record</span>
         </div>
         <div className="runbar">
-          {stale ? (
-            <>
-              <button className="run" onClick={runReview} disabled={phase === "analyzing"}>
-                {phase === "analyzing" ? "Re-analyzing…" : "▶ Re-run Sentinel review"}</button>
-              <span className="run-stale">● record changed since last review</span>
-            </>
-          ) : phase === "analyzing"
-            ? <span className="run-analyzing">◐ Sentinel is analyzing the record against KDIGO 2024…</span>
-            : <span className="run-ok">✓ Reviewed {ranAt} · modify any result to re-run</span>}
+          <button className="run" onClick={runReview} disabled={phase === "analyzing"}>
+            {phase === "analyzing" ? (live ? "Claude working…" : "Analyzing…") : phase === "done" ? "▶ Re-run" : "▶ Run Sentinel"}
+          </button>
+          <label className="live-toggle" title="Run the real Claude tool-calling agent instead of the deterministic core">
+            <input type="checkbox" checked={live} onChange={(e) => setLive(e.target.checked)} disabled={phase === "analyzing"} />
+            ⚡ Live Claude agent
+          </label>
+          <span className="run-status">
+            {phase === "analyzing"
+              ? <span className="run-analyzing">◐ {live ? "Claude is planning and calling the core tools…" : "checking the record against KDIGO 2024…"}</span>
+              : stale ? <span className="run-stale">● record changed — re-run</span>
+              : phase === "done" ? <span className="run-ok">✓ Reviewed {ranAt} · {result?.engine}</span> : null}
+          </span>
         </div>
       </div>
 
       {result && (
         <div className="trace">
           <div className="trace-head"><span className="pulse" data-run={phase === "analyzing"} />
-            <h4>Agent activity — checking the record against the guideline logic</h4></div>
+            <h4>Agent activity — checking the record against the guideline logic</h4>
+            {result.engine && <span className={`engine ${result.engine.startsWith("Claude") ? "live" : ""}`}>{result.engine}</span>}</div>
           {result.trace.slice(0, phase === "done" ? result.trace.length : steps).map((s, i) => (
             <div className="trace-row" key={i}><code>{s.tool}</code><span className="arrow">→</span><span>{s.summary}</span></div>
           ))}
@@ -440,8 +425,10 @@ export default function App() {
     <div className={`split ${id ? "has-detail" : ""}`}>
       <aside className="left">
         <div className="left-head">
-          <div><h1>Sentinel</h1>
-            <p className="sub">{patients ? `${patients.length}-patient panel` : "loading…"} · KDIGO 2024</p></div>
+          <div>
+            <div className="brand"><span className="logo-mark">S</span><h1>Sentinel</h1></div>
+            <p className="sub">{patients ? `${patients.length}-patient panel` : "loading…"} · KDIGO 2024</p>
+          </div>
           <div className="stat"><span className="stat-num">{needAction}</span><span className="stat-label">need action</span></div>
         </div>
         {err && <p className="err">{err}</p>}

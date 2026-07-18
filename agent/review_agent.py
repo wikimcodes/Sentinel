@@ -118,9 +118,23 @@ HARD RULES:
 - Rank surfaced items by clinical priority (1 = most urgent). Call submit_review exactly once at the end."""
 
 
-def run_review(patient_id: str, verbose: bool = False) -> dict:
-    """Drive the tool-use loop for one patient; return {surface, suppress}."""
+def _summ(tool, out):
+    if tool == "stage_patient": return f"CGA {out.get('stage')} · {str(out.get('risk_tier', '?')).upper()} risk"
+    if tool == "check_ckd_definition": return "meets KDIGO CKD definition" if out.get("is_ckd") else "does NOT meet CKD definition"
+    if tool == "egfr_trajectory":
+        d = out.get("decline_per_year")
+        return (f"slope {d:.1f} mL/min/yr over {out.get('steady_state_points_used')} steady-state points → {'RAPID PROGRESSION' if out.get('rapid') else 'stable'}") if d is not None else "insufficient steady-state points"
+    if tool == "evaluate_medications": return ", ".join(f"{m['drug']}: {m['status']}" for m in out.get("medications", []))
+    if tool == "referral_recommendation": return ("refer — " + "; ".join(out.get("reasons", []))) if out.get("refer") else f"no referral criterion (KFRE {out.get('kfre_5yr_pct')}%)"
+    return json.dumps(out)[:90]
+
+
+def run_review(patient_id: str, verbose: bool = False, patient: dict = None) -> dict:
+    """Drive the tool-use loop for one patient; return {surface, suppress, trace}.
+    Pass `patient` to review an edited record (the tools then run on it)."""
     import anthropic
+    if patient is not None:
+        _PATIENTS[patient_id] = patient          # so the core tools see edited labs
     client = anthropic.Anthropic()
     p = _PATIENTS[patient_id]
     user = (f"Review patient '{patient_id}'.\n"
@@ -128,6 +142,7 @@ def run_review(patient_id: str, verbose: bool = False) -> dict:
             f"Medications: {[m['name'] for m in p['medications']]}.\n"
             f"Use the tools to gather the facts, then submit_review.")
     messages = [{"role": "user", "content": user}]
+    trace = []
 
     for _ in range(12):  # generous cap on tool-use turns
         resp = client.messages.create(
@@ -144,17 +159,19 @@ def run_review(patient_id: str, verbose: bool = False) -> dict:
             if block.type != "tool_use":
                 continue
             if block.name == "submit_review":
+                trace.append({"tool": "submit_review", "summary": f"{len(block.input.get('surface', []))} surfaced · {len(block.input.get('suppress', []))} withheld"})
                 if verbose:
                     print(json.dumps(block.input, indent=2))
                 return {"surface": block.input.get("surface", []),
-                        "suppress": block.input.get("suppress", [])}
+                        "suppress": block.input.get("suppress", []), "trace": trace}
             fn = CORE_TOOLS.get(block.name)
             out = fn(block.input["patient_id"]) if fn else {"error": "unknown tool"}
+            trace.append({"tool": block.name, "summary": _summ(block.name, out)})
             if verbose:
                 print(f"  [{block.name}] -> {json.dumps(out)}")
             results.append({"type": "tool_result", "tool_use_id": block.id, "content": json.dumps(out)})
         messages.append({"role": "user", "content": results})
-    return {"surface": [], "suppress": []}
+    return {"surface": [], "suppress": [], "trace": trace}
 
 
 def agent_predict(patient: dict) -> dict:

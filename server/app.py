@@ -26,6 +26,7 @@ def _load_env():
 _load_env()
 
 sys.path.insert(0, os.path.join(HERE, "..", "core"))
+sys.path.insert(0, os.path.join(HERE, "..", "agent"))
 import clinical_core as core
 
 DATA = os.path.join(HERE, "..", "data", "patients.json")
@@ -71,8 +72,8 @@ def build_review(patient):
     lab = labs[-1]
     egfr, acr, k = lab["egfr"], lab["acr_mg_g"], lab["potassium_mmol_l"]
 
-    stage = core.stage_patient(egfr, acr)
     ckd = core.meets_ckd_definition(egfr, acr, patient.get("haematuria"), patient.get("structural_marker"))
+    stage = core.stage_patient(egfr, acr)
     traj = core.egfr_trajectory(labs)
     meds = core.evaluate_medications(patient)
     ref = core.referral_recommendation(patient)
@@ -93,40 +94,55 @@ def build_review(patient):
          "summary": ("refer — " + "; ".join(ref["reasons"])) if ref["refer"] else f"no referral criterion (KFRE {ref['kfre_5yr_pct']}%)"},
         {"tool": "apply_suppression_rules", "summary": f"{len(review['suppress'])} findings considered and deliberately withheld"},
     ]
+    return decorate(review["surface"], review["suppress"], trace, review["ckd"], review["stage"],
+                    review["risk_tier"], review.get("kfre_5yr_pct"), traj.get("rapid"),
+                    engine="deterministic core")
 
-    surface = [{**s, "citation": cite(s)} for s in review["surface"]]
-    suppress = [{**s, "citation": cite(s)} for s in review["suppress"]]
 
-    # clinical brief — missed / needs-attention / working / ruled-out
+def build_review_live(patient):
+    """Same output shape, but the surface/suppress and the tool trace come from the
+    live Claude agent actually calling the core tools. Numbers still come from core."""
+    import review_agent
+    ag = review_agent.run_review(patient["id"], patient=patient)
+    labs = sorted(patient["labs"], key=lambda l: l["date"]); lab = labs[-1]
+    ckd = core.meets_ckd_definition(lab["egfr"], lab["acr_mg_g"], patient.get("haematuria"), patient.get("structural_marker"))
+    stage = core.stage_patient(lab["egfr"], lab["acr_mg_g"])
+    traj = core.egfr_trajectory(labs)
+    ref = core.referral_recommendation(patient)
+    return decorate(ag["surface"], ag["suppress"], ag.get("trace", []), ckd,
+                    stage["stage"] if ckd else None, stage["risk_tier"] if ckd else None,
+                    ref["kfre_5yr_pct"], traj.get("rapid"), engine="Claude agent (live tool-calling)")
+
+
+def decorate(surface_raw, suppress_raw, trace, ckd, stage, tier, kfre, rapid, engine):
+    surface = [{**s, "citation": cite(s)} for s in surface_raw]
+    suppress = [{**s, "citation": cite(s)} for s in suppress_raw]
     missed = [s for s in surface if s["type"] in ("trajectory", "gap", "referral")]
     attention = [s for s in surface if s["type"] in ("safety", "gap_gated")]
     working = [s for s in suppress if s["type"] == "already_optimised"]
     ruled_out = [s for s in suppress if s["type"] != "already_optimised"]
     brief = {"missed": missed, "attention": attention, "working": working, "ruled_out": ruled_out,
-             "headline": headline(patient, review, traj, missed, attention)}
-
-    return {"ckd": review["ckd"], "stage": review["stage"], "risk_tier": review["risk_tier"],
-            "kfre_5yr_pct": review.get("kfre_5yr_pct"), "trace": trace,
-            "surface": surface, "suppress": suppress, "brief": brief}
+             "headline": headline(ckd, rapid, missed, attention)}
+    return {"ckd": ckd, "stage": stage, "risk_tier": tier, "kfre_5yr_pct": kfre, "engine": engine,
+            "trace": trace, "surface": surface, "suppress": suppress, "brief": brief}
 
 
-def headline(patient, review, traj, missed, attention):
-    if not review["ckd"]:
+def headline(ckd, rapid, missed, attention):
+    if not ckd:
         return "No CKD — this patient does not meet the KDIGO definition. Nothing to action."
-    n = len(missed)
     parts = []
-    if traj.get("rapid"):
+    if rapid:
         parts.append("a rapid eGFR decline invisible visit-to-visit")
     gaps = [s["drug"] for s in missed if s["type"] == "gap"]
     if gaps:
         parts.append("a now-indicated " + " and ".join(gaps) + " that was never started")
     if any(s["type"] == "referral" for s in missed):
-        parts.append("nephrology-referral criteria now met")
+        parts.append("nephrology-referral criteria met")
     if attention:
         parts.append("a drug held pending hyperkalaemia")
     if not parts:
         return "Reviewed against KDIGO 2024 — this patient is on optimal therapy and stable. No action needed."
-    return f"Sentinel caught {', '.join(parts)} — {n} item{'s' if n != 1 else ''} a busy 10-minute visit would likely miss."
+    return f"Sentinel caught {', '.join(parts)} — {len(missed)} item{'s' if len(missed) != 1 else ''} a busy 10-minute visit would likely miss."
 
 
 # ---------------------------------------------------------------------------
@@ -224,6 +240,13 @@ class H(BaseHTTPRequestHandler):
                 return self._send({"error": "unknown patient"}, 404)
             patient = {**base, "labs": b.get("labs", base["labs"])}
             if self.path == "/api/review":
+                if b.get("live"):
+                    try:
+                        return self._send(build_review_live(patient))
+                    except Exception as e:
+                        r = build_review(patient)
+                        r["engine"] = f"deterministic core (live agent unavailable: {e})"
+                        return self._send(r)
                 return self._send(build_review(patient))
             if self.path == "/api/referral":
                 letter, source = referral_letter(patient)
