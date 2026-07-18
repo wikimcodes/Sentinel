@@ -16,7 +16,7 @@ An agent that runs the between-visit clinical review no clinician has time to ru
 
 Abridge captured the highest-value fifteen minutes in medicine — the visit — and turned the conversation into structured data. But chronic disease isn't managed in the visit; it's managed in the 364 days *between* visits, where today almost nothing happens: no monitoring, no titration, no escalation until the patient deteriorates and shows up in the emergency department. That gap is where the majority of chronic-disease cost and morbidity accrues.
 
-Moya's thesis is that this between-visit layer can be run by an agent: continuously ingesting labs, devices, medications and symptoms; reasoning longitudinally; escalating only what needs a human. This is agentic in the sense that matters — it replaces *labour* (the care-coordinator workflow that doesn't scale), not just assists with a task — and it compounds, because every patient-year of longitudinal reasoning makes the next decision better.
+Sentinel's thesis is that this between-visit layer can be run by an agent: continuously ingesting labs, devices, medications and symptoms; reasoning longitudinally; escalating only what needs a human. This is agentic in the sense that matters — it replaces *labour* (the care-coordinator workflow that doesn't scale), not just assists with a task — and it compounds, because every patient-year of longitudinal reasoning makes the next decision better.
 
 CKD is the ideal first wedge: clear labs, clear guidelines, clear deterioration signals, and a genuine, catchable under-treatment pattern in the real world. The narrow, deep slice implies the platform. Big vision, narrow knife.
 
