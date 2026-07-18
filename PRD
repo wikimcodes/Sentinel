@@ -1,4 +1,4 @@
- # CKD Between-Visit Agent
+ # Moya — CKD Between-Visit Agent
 ### Product Requirements Document · v2.0
 
 **Event:** Abridge × Anthropic × Lightspeed × Cerebral Valley — "Build Agents for Healthcare Clinics"
@@ -16,7 +16,7 @@ An agent that runs the between-visit clinical review no clinician has time to ru
 
 Abridge captured the highest-value fifteen minutes in medicine — the visit — and turned the conversation into structured data. But chronic disease isn't managed in the visit; it's managed in the 364 days *between* visits, where today almost nothing happens: no monitoring, no titration, no escalation until the patient deteriorates and shows up in the emergency department. That gap is where the majority of chronic-disease cost and morbidity accrues.
 
-The thesis is that this between-visit layer can be run by an agent: continuously ingesting labs, devices, medications and symptoms; reasoning longitudinally; escalating only what needs a human. This is agentic in the sense that matters — it replaces *labour* (the care-coordinator workflow that doesn't scale), not just assists with a task — and it compounds, because every patient-year of longitudinal reasoning makes the next decision better.
+Moya's thesis is that this between-visit layer can be run by an agent: continuously ingesting labs, devices, medications and symptoms; reasoning longitudinally; escalating only what needs a human. This is agentic in the sense that matters — it replaces *labour* (the care-coordinator workflow that doesn't scale), not just assists with a task — and it compounds, because every patient-year of longitudinal reasoning makes the next decision better.
 
 CKD is the ideal first wedge: clear labs, clear guidelines, clear deterioration signals, and a genuine, catchable under-treatment pattern in the real world. The narrow, deep slice implies the platform. Big vision, narrow knife.
 
@@ -47,7 +47,7 @@ Concrete success criteria for the demo: the agent triages a small panel; surface
 
 ## 5. Users
 
-**Primary user — the clinician** (GP, nephrology-adjacent physician) managing a panel of chronic patients with no time to review each longitudinally between visits. They need to open a view each morning and see, per patient, what changed, what's now indicated, and what needs escalation — with enough reasoning shown that they can trust or overrule it in seconds. They will switch off anything that nags.
+**Primary user — the clinician** (GP, nephrology-adjacent physician, or care-coordinating nurse) managing a panel of chronic patients with no time to review each longitudinally between visits. They need to open a view each morning and see, per patient, what changed, what's now indicated, and what needs escalation — with enough reasoning shown that they can trust or overrule it in seconds. They will switch off anything that nags.
 
 **Secondary beneficiary — the patient**, whose slow decline or missing cardiorenal-protective drug is caught months earlier than it otherwise would be.
 
@@ -124,7 +124,7 @@ Suppress, and log a one-line reason, when any of the following hold:
 - **eGFR failure modes:** extremes of muscle mass (cachexia, amputee, bodybuilder) or creatinine-secretion blockers causing pseudo-rise (trimethoprim, cimetidine) — output "confirm with cystatin C," do not act on the number.
 - **Already optimised:** patient already on the indicated drug — no nag.
 - **Not CKD:** G1/G2 + A1 with no damage marker — normal kidney, don't surface.
-- **Safety gate (surface but hold):** drug indicated but a safety parameter blocks initiation (e.g. K⁺ ≥5.5 for RASi/nsMRA) — surface as "indicated, gated on hyperkalaemia — treat K⁺ first," not a clean "start drug."
+- **Safety gate (surface but hold):** drug indicated but a safety parameter blocks initiation (e.g. K⁺ >5.5 for a RAS inhibitor, or the stricter K⁺ >5.0 for finerenone initiation) — surface as "indicated, gated on hyperkalaemia — treat K⁺ first," not a clean "start drug."
 
 ### 8.5 Referral logic
 
