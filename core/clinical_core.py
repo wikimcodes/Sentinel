@@ -8,8 +8,7 @@ Each public function is individually typed and testable, and is exposed to Claud
 as a tool (see agent/tools.py). `review_patient` is the deterministic composition
 of all of them — used as the eval's reference and as an offline fallback.
 
-This is a SEPARATE implementation from the eval oracle in data/generate_patients.py;
-core/test_core.py cross-checks the two agree on all 50 gold patients.
+core/test_core.py cross-checks review_patient against the frozen gold patients (data/patients.json).
 """
 from __future__ import annotations
 import math

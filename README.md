@@ -21,7 +21,7 @@ Not RAG: guideline logic is *encoded as testable thresholds the model cannot ove
 A naive rule engine fires wrong **48.6%** of the time and recommends starting drugs into hyperkalaemia (**0%** on safety-gating). Sentinel's suppression layer drives false alarms to **0%**. The product is the gap between those two rows.
 
 ```
-python3 data/generate_patients.py   # build the 50-patient gold set
+python3 data/from_wiki.py           # project the gold set into the app schema -> patients.json
 python3 core/test_core.py           # 22 unit tests + core-vs-goldset cross-check
 python3 evals/score.py              # Sentinel target vs naive baseline
 python3 evals/run_agent.py          # live Claude agent as a third row (needs anthropic + API key)
@@ -36,9 +36,10 @@ core/
   clinical_core.py        deterministic KDIGO tools: staging, slope, KFRE, gaps, suppression
   test_core.py            22 unit tests + cross-check that core agrees with the gold set on all 50
 data/
-  gold_patients.json      10 hand-authored anchor patients (incl. the demo hero)
-  generate_patients.py    clinical oracle + generator -> patients.json (50)
-  patients.json           the gold set: 50 patients tagged persona/JTBD/category, with ground-truth expected
+  from_wiki.py            projects the gold set into the app schema -> patients.json
+  patients.json           50 patients in the app schema, generated from the gold set
+docs/
+  sentinel_demo_patients_50   the clinician-authored gold set: 50 CKD patients + ground-truth expected
 agent/
   review_agent.py         Claude plans + calls the core tools (by patient_id, on real data) -> submit_review
 evals/

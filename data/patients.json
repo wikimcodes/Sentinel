@@ -4789,8 +4789,8 @@
           "potassium_mmol_l": 4.5,
           "creatinine_mg_dl": 1.6,
           "flags": [
-            "trimethoprim_course",
-            "acute_illness"
+            "acute_illness",
+            "trimethoprim_course"
           ]
         }
       ],
@@ -6011,8 +6011,8 @@
           "potassium_mmol_l": 4.4,
           "creatinine_mg_dl": 0.95,
           "flags": [
-            "trimethoprim_course",
-            "acute_illness"
+            "acute_illness",
+            "trimethoprim_course"
           ]
         }
       ],
@@ -6955,8 +6955,8 @@
           "potassium_mmol_l": 4.3,
           "creatinine_mg_dl": 0.81,
           "flags": [
-            "trimethoprim_course",
-            "acute_illness"
+            "acute_illness",
+            "trimethoprim_course"
           ]
         }
       ],

@@ -38,7 +38,7 @@ Chen is the persona that decides adoption. A GP can be impressed by a risk grid;
 
 ## 3. Eval categories — the 50-patient gold set
 
-Each patient is tagged `persona · jtbd · category · difficulty` and carries a ground-truth `expected` block (what MUST surface, what MUST be suppressed, and why). Ground truth is produced by a transparent **clinical oracle** (`data/generate_patients.py`) encoding KDIGO 2024 — deliberately separate from `core/` (the tools the agent calls), so the eval scores the agent against independent truth, not itself.
+Each patient is tagged `persona · jtbd · category · difficulty` and carries a ground-truth `expected` block (what MUST surface, what MUST be suppressed, and why). Ground truth is the **clinician-authored gold set** (`docs/sentinel_demo_patients_50`) encoding KDIGO 2024 — deliberately separate from `core/` (the tools the agent calls), so the eval scores the agent against independent truth, not itself.
 
 | Category | Primary JTBD | n | What it proves |
 |---|---|---|---|
@@ -89,6 +89,6 @@ The naive engine looks fine to the GP (92%) and is useless to the reviewer (4%) 
 
 ## 5. How to extend
 
-- **New patient:** add an archetype in `generate_patients.py` (or a hand-authored anchor in `gold_patients.json`); the oracle computes its `expected`.
+- **New patient:** add a case to the gold set (`docs/sentinel_demo_patients_50`) with its `expected` block, then run `data/from_wiki.py` to project it into the app.
 - **New drug / rule:** add it to the oracle *and* to `core/`, then re-run `score.py` — the gold set catches regressions.
 - **Wire the live agent:** implement `agent_predict(p)` in `score.py` to return `{surface, suppress}` from Claude + `core/` tools, and report it as a third row next to naive and target.

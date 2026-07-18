@@ -61,7 +61,7 @@ def build(wp):
     latest = labs[-1]; lf = set(latest.get("flags", []))
     if any(w in ctx for w in ["trimethoprim", "cimetidine"]): lf.add("trimethoprim_course")
     if any(w in ctx for w in ["muscle mass", "amputation", "frail", "bodybuilder", "cachex"]): lf.add("low_muscle_mass")
-    if lf: latest["flags"] = list(lf)
+    if lf: latest["flags"] = sorted(lf)   # sorted for deterministic output (set order is not stable)
 
     meds = [{"name": m, "dose": DOSE.get(m, ""), "class": MED_CLASS.get(m, "other")} for m in wp["medications"]]
 
