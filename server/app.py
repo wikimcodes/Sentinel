@@ -32,8 +32,18 @@ import clinical_core as core
 
 DATA = os.path.join(HERE, "..", "data", "patients.json")
 PATIENTS = {p["id"]: p for p in json.load(open(DATA))["patients"]}
-PORT = 8787
+PORT = int(os.environ.get("PORT", 8787))   # hosts (Render/Railway/Fly) inject PORT
+HOST = os.environ.get("HOST", "0.0.0.0")   # 0.0.0.0 so the platform can route to it
 MODEL = "claude-opus-4-8"
+
+# Built React app (ui/dist) — served by this same process in production so the
+# whole product is one service at one URL. `cd ui && npm run build` produces it.
+DIST = os.path.normpath(os.path.join(HERE, "..", "ui", "dist"))
+_CT = {".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript",
+       ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml",
+       ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon",
+       ".woff": "font/woff", ".woff2": "font/woff2", ".map": "application/json",
+       ".txt": "text/plain", ".webmanifest": "application/manifest+json"}
 
 # ---------------------------------------------------------------------------
 # Guideline citations — every finding maps to the rule that justifies it
@@ -280,7 +290,25 @@ class H(BaseHTTPRequestHandler):
         if self.path == "/api/evals":
             import eval_summary
             return self._send(eval_summary.compute())
-        self._send({"error": "not found"}, 404)
+        if self.path.startswith("/api/"):
+            return self._send({"error": "not found"}, 404)
+        return self._serve_static()   # everything else -> the built React app
+
+    def _serve_static(self):
+        rel = self.path.split("?", 1)[0].lstrip("/") or "index.html"
+        full = os.path.normpath(os.path.join(DIST, rel))
+        if not full.startswith(DIST):                       # path-traversal guard
+            return self._send({"error": "forbidden"}, 403)
+        if not os.path.isfile(full):                        # SPA fallback
+            full = os.path.join(DIST, "index.html")
+        if not os.path.isfile(full):
+            return self._send({"error": "UI not built — run: cd ui && npm run build"}, 404)
+        data = open(full, "rb").read()
+        self.send_response(200)
+        self.send_header("Content-Type", _CT.get(os.path.splitext(full)[1], "application/octet-stream"))
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
 
     def do_POST(self):
         try:
@@ -345,5 +373,6 @@ class H(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    print(f"Sentinel backend on http://localhost:{PORT}  ({len(PATIENTS)} patients)")
-    ThreadingHTTPServer(("127.0.0.1", PORT), H).serve_forever()
+    ui = "serving built UI from ui/dist" if os.path.isfile(os.path.join(DIST, "index.html")) else "UI not built (run: cd ui && npm run build)"
+    print(f"Sentinel on http://{HOST}:{PORT}  ({len(PATIENTS)} patients) — {ui}")
+    ThreadingHTTPServer((HOST, PORT), H).serve_forever()

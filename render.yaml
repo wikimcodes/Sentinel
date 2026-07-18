@@ -1,0 +1,12 @@
+# Render Blueprint — deploy Sentinel as one Docker web service.
+# In Render: New +  ->  Blueprint  ->  pick this repo. Then set ANTHROPIC_API_KEY
+# in the service's Environment tab (it is marked sync:false so it is never committed).
+services:
+  - type: web
+    name: sentinel
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/patients
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
