@@ -398,3 +398,43 @@ h1 { font-size: 27px; } h2 { font-size: 26px; }
 .edge.fw-bola { stroke: var(--warn); stroke-width: 2; }
 .edge.fw-chen { stroke: var(--accent); stroke-width: 2.2; }
 .ah { fill: var(--text-dim); }
+
+/* ============ EHR application shell ============ */
+.app-shell { display: flex; flex-direction: column; height: 100vh; }
+.appbar { display: flex; align-items: center; gap: 26px; height: 56px; flex-shrink: 0;
+  padding: 0 20px; background: var(--surface); border-bottom: 1px solid var(--border); z-index: 10; }
+.appbar .brand h1 { font-size: 20px; }
+.topnav { display: flex; gap: 4px; }
+.topnav button { background: transparent; border: none; color: var(--text-dim); padding: 8px 15px;
+  border-radius: 999px; font: 600 13.5px var(--sans); cursor: pointer; }
+.topnav button:hover { color: var(--text); background: var(--surface-2); }
+.topnav button.active { color: #fff; background: var(--accent); }
+.appbar-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+.searchbox { display: flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; }
+.searchbox .mag { color: var(--text-dim); font-size: 15px; }
+.searchbox input { border: none; background: transparent; outline: none; font: 13px var(--sans); color: var(--text); width: 168px; }
+.userchip { display: flex; align-items: center; gap: 8px; }
+.user-av { width: 32px; height: 32px; border-radius: 50%; background: var(--text); color: var(--surface); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.user-meta { display: flex; flex-direction: column; line-height: 1.15; }
+.user-meta strong { font-size: 13px; }
+.user-meta small { font-size: 11px; color: var(--text-dim); }
+
+/* split now lives inside the shell */
+.split { flex: 1; min-height: 0; height: auto; }
+.worklist-head { display: flex; align-items: center; gap: 14px; padding: 15px 18px 12px; border-bottom: 1px solid var(--border); }
+.worklist-head h3 { margin: 0; font-size: 14px; font-family: var(--sans); text-transform: uppercase; letter-spacing: .5px; color: var(--text-dim); }
+
+/* Patient banner (EHR chart header) */
+.patient-banner { display: flex; align-items: center; gap: 18px; background: var(--surface);
+  border: 1px solid var(--border); border-top: 3px solid var(--accent); border-radius: 14px;
+  padding: 14px 18px; margin-bottom: 18px; box-shadow: var(--shadow); }
+.pb-av { width: 48px; height: 48px; border-radius: 12px; background: var(--accent); color: #fff;
+  display: grid; place-items: center; font-family: var(--serif); font-size: 19px; font-weight: 700; flex-shrink: 0; }
+.pb-id { flex: 1; min-width: 0; }
+.pb-id h2 { margin: 0 0 5px; font-size: 23px; }
+.pb-fields { display: flex; flex-wrap: wrap; gap: 5px 20px; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.pb-fields label { color: var(--text-dim); text-transform: uppercase; font-size: 9px; letter-spacing: .5px; margin-right: 6px; }
+.pb-flags { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; justify-content: flex-end; max-width: 320px; }
+.pb-chip { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 7px; background: var(--surface-2); border: 1px solid var(--border); white-space: nowrap; }
+.pb-chip.allergy { color: var(--ok); border-color: var(--ok); }
+.pb-chip.warn { background: rgba(217,119,6,.14); border-color: var(--warn); color: var(--warn); }

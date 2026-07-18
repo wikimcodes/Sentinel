@@ -236,14 +236,26 @@ function EHRReview({ patient }) {
 
   return (
     <section className="right open">
-      <header className="detail-head">
-        <div>
+      <header className="patient-banner">
+        <div className="pb-av">{patient.name.split(" ").map((s) => s[0]).join("").slice(0, 2)}</div>
+        <div className="pb-id">
           <h2>{patient.name}</h2>
-          <p className="sub">{patient.age}{patient.sex} · MRN {patient.id.toUpperCase()}</p>
+          <div className="pb-fields">
+            <span><label>Age/Sex</label>{patient.age} {patient.sex === "M" ? "Male" : "Female"}</span>
+            <span><label>DOB</label>{`01 Jan ${new Date().getFullYear() - patient.age}`}</span>
+            <span><label>MRN</label>{patient.id.toUpperCase()}</span>
+            <span><label>NHS</label>{`485 ${(patient.age * 37) % 900 + 100} ${(patient.age * 113) % 9000 + 1000}`}</span>
+          </div>
         </div>
-        <span className="stage-chip" style={{ borderColor: t.color, color: t.color }}>
-          CKD {patient.expected.stage || "—"} · {t.label}
-        </span>
+        <div className="pb-flags">
+          <span className="pb-chip allergy" title="No known drug allergies">NKDA</span>
+          {patient.diabetes && <span className="pb-chip">Diabetic</span>}
+          {patient.pregnant && <span className="pb-chip warn">⚠ Pregnant</span>}
+          {patient.dialysis && <span className="pb-chip warn">⚠ Dialysis</span>}
+          <span className="stage-chip" style={{ borderColor: t.color, color: t.color }}>
+            CKD {patient.expected.stage || "—"} · {t.label}
+          </span>
+        </div>
       </header>
 
       {/* ---------- EHR record: tabbed ---------- */}
@@ -620,7 +632,8 @@ export default function App() {
   const [patients, setPatients] = useState(null);
   const [err, setErr] = useState(null);
   const [id, setId] = useState(null);
-  const [view, setView] = useState("panel");   // panel | evals
+  const [view, setView] = useState("panel");   // panel | architecture | framework | evals
+  const [q, setQ] = useState("");
 
   useEffect(() => {
     fetch("/api/patients").then((r) => r.json()).then((d) => setPatients(d.patients))
@@ -635,45 +648,58 @@ export default function App() {
 
   const selected = patients && patients.find((p) => p.id === id);
   const needAction = patients ? patients.filter((p) => p.expected.surface.length).length : 0;
+  const shown = rows.filter((p) => !q || p.name.toLowerCase().includes(q.toLowerCase()) || p.id.toLowerCase().includes(q.toLowerCase()));
 
   return (
-    <div className={`split ${id ? "has-detail" : ""}`}>
-      <aside className="left">
-        <div className="left-head">
-          <div>
-            <div className="brand"><span className="logo-mark">S</span><h1>Sentinel</h1></div>
-            <p className="sub">{patients ? `${patients.length}-patient panel` : "loading…"} · KDIGO 2024</p>
-          </div>
-          <div className="stat"><span className="stat-num">{needAction}</span><span className="stat-label">need action</span></div>
-        </div>
-        <div className="rail-nav">
-          {[["panel", "Panel"], ["architecture", "Architecture"], ["framework", "Framework"], ["evals", "Evals"]].map(([v, label]) => (
+    <div className="app-shell">
+      <header className="appbar">
+        <div className="brand"><span className="logo-mark">S</span><h1>Sentinel</h1></div>
+        <nav className="topnav">
+          {[["panel", "Worklist"], ["architecture", "Architecture"], ["framework", "Framework"], ["evals", "Evals"]].map(([v, label]) => (
             <button key={v} className={view === v ? "active" : ""} onClick={() => setView(v)}>{label}</button>
           ))}
+        </nav>
+        <div className="appbar-right">
+          <div className="searchbox">
+            <span className="mag">⌕</span>
+            <input placeholder="Search patients…" value={q} onChange={(e) => { setQ(e.target.value); setView("panel"); }} />
+          </div>
+          <div className="userchip"><span className="user-av">RA</span><span className="user-meta"><strong>Dr. Rao</strong><small>Nephrology</small></span></div>
         </div>
-        {err && <p className="err">{err}</p>}
-        <div className="patient-list">
-          {rows.map((p) => {
-            const tt = TIER[tierOf(p)]; const acts = p.expected.surface.length;
-            return (
-              <button key={p.id} className={`row ${p.id === id ? "sel" : ""}`} onClick={() => { setId(p.id); setView("panel"); }}>
-                <span className="dot" style={{ background: tt.color }} />
-                <span className="row-main"><span className="row-name">{p.name}</span>
-                  <span className="row-line">{topLine(p)}</span></span>
-                <span className="row-right"><span className="row-stage">{p.expected.stage || "G2 A1"}</span>
-                  <span className={`row-badge ${acts ? "act" : "quiet"}`}>{acts || "✓"}</span></span>
-              </button>
-            );
-          })}
-        </div>
-      </aside>
+      </header>
 
-      {view === "evals" ? <EvalDashboard /> : view === "architecture" ? <ArchitectureView /> : view === "framework" ? <FrameworkView /> : selected ? <EHRReview key={selected.id} patient={selected} /> : (
-        <section className="right empty-detail">
-          <div><p className="hint-title">Open a patient file</p>
-            <p className="hint">Sentinel pre-sifts each record against KDIGO 2024 and surfaces what a 10-minute visit would miss — then lets you act on it.</p></div>
-        </section>
-      )}
+      <div className="split">
+        {view === "panel" && (
+          <aside className="left">
+            <div className="worklist-head">
+              <div><h3>CKD worklist</h3><p className="sub">{patients ? `${shown.length} patients` : "loading…"}</p></div>
+              <div className="stat"><span className="stat-num">{needAction}</span><span className="stat-label">need action</span></div>
+            </div>
+            {err && <p className="err">{err}</p>}
+            <div className="patient-list">
+              {shown.map((p) => {
+                const tt = TIER[tierOf(p)]; const acts = p.expected.surface.length;
+                return (
+                  <button key={p.id} className={`row ${p.id === id ? "sel" : ""}`} onClick={() => setId(p.id)}>
+                    <span className="dot" style={{ background: tt.color }} />
+                    <span className="row-main"><span className="row-name">{p.name}</span>
+                      <span className="row-line">{topLine(p)}</span></span>
+                    <span className="row-right"><span className="row-stage">{p.expected.stage || "G2 A1"}</span>
+                      <span className={`row-badge ${acts ? "act" : "quiet"}`}>{acts || "✓"}</span></span>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+        )}
+
+        {view === "evals" ? <EvalDashboard /> : view === "architecture" ? <ArchitectureView /> : view === "framework" ? <FrameworkView /> : selected ? <EHRReview key={selected.id} patient={selected} /> : (
+          <section className="right empty-detail">
+            <div><p className="hint-title">Select a patient</p>
+              <p className="hint">Sentinel pre-sifts each record against KDIGO 2024 and surfaces what a 10-minute visit would miss — then lets you act on it.</p></div>
+          </section>
+        )}
+      </div>
     </div>
   );
 }
