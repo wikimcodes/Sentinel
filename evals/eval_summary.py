@@ -5,10 +5,27 @@ carries the (expensive, pre-measured) live-Claude-agent result.
 
 compute() returns a JSON-able dict the /api/evals endpoint serves.
 """
-import json, os, sys
+import json, os, sys, re
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "core"))
 import clinical_core as core
+
+_STAGE_RE = re.compile(r"G[1-5][ab]?|A[1-3]", re.I)
+def _norm_stage(s):
+    """Canonical 'G# A#' token. Wiki authors annotate a stage with clinical
+    caveats — 'G3b A2 (provisional, unconfirmed)', 'G3a A2 (face value,
+    creatinine-based)'. The stage is identical; only the note differs. Compare
+    on the KDIGO token so an annotated stage isn't scored as a staging error."""
+    return " ".join(m.group(0).upper() for m in _STAGE_RE.finditer(str(s or "")))
+
+def _stage_match(review, exp):
+    """Staging agreement. If both the core and the reference agree the patient is
+    not CKD, there is no CKD to stage — that is agreement, not a staging error
+    (the CKD determination is scored separately as CKD-gate accuracy). Otherwise
+    compare on the normalised KDIGO token."""
+    if not review["ckd"] and not exp.get("is_ckd"):
+        return True
+    return _norm_stage(review["stage"]) == _norm_stage(exp.get("stage"))
 
 WIKI = json.load(open(os.path.join(HERE, "..", "docs", "sentinel_demo_patients_50")))["patients"]
 
@@ -97,7 +114,7 @@ def compute():
     golds = [wiki_tokens(wp) for wp in WIKI]
     naive = _prf([(naive_tokens(p), g) for p, g in zip(adapted, golds)])
     core_m = _prf([(core_tokens(p), g) for p, g in zip(adapted, golds)])
-    stage_ok = sum(str(core.review_patient(p)["stage"]) == str(wp["expected"].get("stage"))
+    stage_ok = sum(_stage_match(core.review_patient(p), wp["expected"])
                    for p, wp in zip(adapted, WIKI))
     ckd_ok = sum(core.review_patient(p)["ckd"] == wp["expected"].get("is_ckd") for p, wp in zip(adapted, WIKI))
     n = len(WIKI)

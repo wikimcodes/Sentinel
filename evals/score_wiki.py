@@ -9,12 +9,26 @@ comparable set of clinical findings, and score precision/recall/F1 + staging.
 
 No API calls — this scores the deterministic core (the agent orchestrates the same core).
 """
-import json, os, sys
+import json, os, sys, re
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "core"))
 import clinical_core as core
 
 WIKI = json.load(open(os.path.join(HERE, "..", "docs", "sentinel_demo_patients_50")))["patients"]
+
+_STAGE_RE = re.compile(r"G[1-5][ab]?|A[1-3]", re.I)
+def _norm_stage(s):
+    """Canonical 'G# A#' token, ignoring clinical annotations Wiki appends to a
+    stage (e.g. '(provisional, unconfirmed)') so an annotated but identical stage
+    is not counted as a staging error."""
+    return " ".join(m.group(0).upper() for m in _STAGE_RE.finditer(str(s or "")))
+
+def _stage_match(review, exp):
+    """Mutual 'not CKD' is staging agreement, not an error (the CKD determination
+    is scored separately). Otherwise compare on the normalised KDIGO token."""
+    if not review["ckd"] and not exp.get("is_ckd"):
+        return True
+    return _norm_stage(review["stage"]) == _norm_stage(exp.get("stage"))
 VERBOSE = "-v" in sys.argv
 
 MED_CLASS = {
@@ -90,7 +104,7 @@ for wp in WIKI:
     TP += len(tp); FP += len(fp); FN += len(fn)
     exp = wp["expected"]
     ckd_ok += (r["ckd"] == exp.get("is_ckd"))
-    stage_ok += (str(r["stage"]) == str(exp.get("stage")))
+    stage_ok += _stage_match(r, exp)
     if fp or fn:
         mism.append((wp["id"], sorted(fp), sorted(fn),
                      " ".join(wp.get("context", []))[:38]))
