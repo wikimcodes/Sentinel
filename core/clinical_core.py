@@ -249,7 +249,7 @@ def diagnosis_codes(egfr, acr, diabetes=False, hypertension=False):
     if diabetes:
         out.append({"label": "Type 2 diabetes with diabetic CKD", "snomed": None, "icd10": "E11.22"})
     if hypertension:
-        out.append({"label": "Hypertensive chronic kidney disease", "snomed": None, "icd10": "I12.9"})
+        out.append({"label": "Hypertension", "snomed": "38341003", "icd10": "I10"})
     return out
 
 

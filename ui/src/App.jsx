@@ -42,7 +42,7 @@ const codedAlready = (c, codes) => {
   const cl = c.toLowerCase();
   const blob = (codes || []).map((x) => x.label.toLowerCase()).join(" ");
   if (cl.includes("chronic kidney")) return blob.includes("chronic kidney");
-  if (cl.includes("hypertension"))   return blob.includes("hypertensive");
+  if (cl.includes("hypertension"))   return blob.includes("hypertens");
   if (cl.includes("diabetes"))       return blob.includes("diabet");
   if (cl.includes("albumin"))        return blob.includes("albumin");
   return false;

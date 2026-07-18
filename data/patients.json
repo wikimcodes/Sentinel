@@ -139,6 +139,11 @@
             "label": "Severe albuminuria (macroalbuminuria)",
             "snomed": null,
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -387,6 +392,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -526,6 +536,11 @@
             "label": "Severe albuminuria (macroalbuminuria)",
             "snomed": null,
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -673,6 +688,11 @@
             "label": "Severe albuminuria (macroalbuminuria)",
             "snomed": null,
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -844,6 +864,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -1030,6 +1055,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -1184,6 +1214,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -1348,6 +1383,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -1493,6 +1533,11 @@
             "label": "Severe albuminuria (macroalbuminuria)",
             "snomed": null,
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -1624,6 +1669,11 @@
             "label": "Severe albuminuria (macroalbuminuria)",
             "snomed": null,
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [],
@@ -1791,6 +1841,11 @@
             "label": "Severe albuminuria (macroalbuminuria)",
             "snomed": null,
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -1939,6 +1994,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -2072,6 +2132,11 @@
             "label": "Severe albuminuria (macroalbuminuria)",
             "snomed": null,
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -2199,6 +2264,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -2384,6 +2454,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -2542,6 +2617,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -2712,6 +2792,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -2847,6 +2932,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -2974,6 +3064,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [],
@@ -3112,6 +3207,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -3256,6 +3356,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -3409,6 +3514,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -3558,6 +3668,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [],
@@ -3729,6 +3844,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -3925,6 +4045,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -4073,6 +4198,11 @@
             "label": "Severe albuminuria (macroalbuminuria)",
             "snomed": null,
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -4243,6 +4373,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -4416,6 +4551,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -4576,6 +4716,11 @@
             "label": "Severe albuminuria (macroalbuminuria)",
             "snomed": null,
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -4720,6 +4865,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -4908,6 +5058,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -5067,6 +5222,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -5255,6 +5415,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -5397,6 +5562,11 @@
             "label": "Chronic kidney disease, stage 3B",
             "snomed": "700379002",
             "icd10": "N18.32"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -5550,6 +5720,11 @@
             "label": "Severe albuminuria (macroalbuminuria)",
             "snomed": null,
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -5660,6 +5835,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [],
@@ -5786,6 +5966,11 @@
             "label": "Severe albuminuria (macroalbuminuria)",
             "snomed": null,
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -5940,6 +6125,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -6233,6 +6423,11 @@
             "label": "Chronic kidney disease, stage 3A",
             "snomed": "700378005",
             "icd10": "N18.31"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -6347,6 +6542,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [],
@@ -6472,6 +6672,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -6584,6 +6789,11 @@
             "label": "Chronic kidney disease, stage 3A",
             "snomed": "700378005",
             "icd10": "N18.31"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -6701,6 +6911,11 @@
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [
@@ -6825,6 +7040,11 @@
             "label": "Chronic kidney disease, stage 3A",
             "snomed": "700378005",
             "icd10": "N18.31"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [],
@@ -7142,6 +7362,11 @@
             "label": "Type 2 diabetes with diabetic CKD",
             "snomed": null,
             "icd10": "E11.22"
+          },
+          {
+            "label": "Hypertension",
+            "snomed": "38341003",
+            "icd10": "I10"
           }
         ],
         "surface": [

@@ -101,7 +101,9 @@ def build(wp):
     p["encounters"] = enc
     p["source"] = "wiki"
     p["wiki_expected"] = wp["expected"]     # keep Wiki's ground truth for reference
-    p["expected"] = expected
+    # Re-run now that the problem list (incl. Hypertension for CKD patients) is set,
+    # so the diagnosis codes reflect the coded comorbidities. Staging is unchanged.
+    p["expected"] = core.review_patient(p)
     if wp.get("trigger"):                   # between-visit trigger event — drives most-recent sort
         p["trigger"] = wp["trigger"]
     if wp.get("summary"):
