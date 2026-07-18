@@ -214,6 +214,37 @@ def claude_referral(facts):
 
 
 # ---------------------------------------------------------------------------
+# Patient outreach — invite to book (Claude-written SMS, template fallback)
+# ---------------------------------------------------------------------------
+def patient_message(patient):
+    first = patient["name"].split(" ")[0]
+    review = core.review_patient(patient)
+    reason = "a kidney (nephrology) review" if any(s["type"] == "referral" for s in review.get("surface", [])) else "a kidney health review"
+    txt = claude_sms(first, reason)
+    if txt:
+        return txt, "claude"
+    return (f"Hi {first}, this is your GP surgery. Following your recent blood tests we'd like to see you for "
+            f"{reason}. Please book an appointment at nhs.uk/book or call the surgery. Thank you.", "template")
+
+def claude_sms(first, reason):
+    try:
+        import anthropic
+    except Exception:
+        return None
+    if not (os.environ.get("ANTHROPIC_API_KEY") or os.path.exists(os.path.expanduser("~/.config/anthropic"))):
+        return None
+    try:
+        client = anthropic.Anthropic()
+        prompt = (f"Write one short, warm, plain-English SMS (max 40 words) from a UK GP surgery to a patient "
+                  f"named {first}, inviting them to book {reason} after recent blood tests. No medical detail, "
+                  f"no alarm, include a simple booking prompt. Return only the message text.")
+        r = client.messages.create(model=MODEL, max_tokens=200, messages=[{"role": "user", "content": prompt}])
+        return "".join(b.text for b in r.content if b.type == "text").strip()
+    except Exception:
+        return None
+
+
+# ---------------------------------------------------------------------------
 # HTTP
 # ---------------------------------------------------------------------------
 class H(BaseHTTPRequestHandler):
@@ -252,6 +283,39 @@ class H(BaseHTTPRequestHandler):
             if not base:
                 return self._send({"error": "unknown patient"}, 404)
             patient = {**base, "labs": b.get("labs", base["labs"])}
+            if self.path == "/api/ask":
+                import review_agent
+                return self._send(review_agent.ask(patient["id"], b.get("question", ""), patient))
+            if self.path == "/api/notify-patient":
+                msg, src = patient_message(patient)
+                return self._send({"to": f"{patient['name']} · mobile on file", "message": msg, "source": src, "sent": True})
+            if self.path == "/api/review-stream":
+                import review_agent
+                self.send_response(200)
+                self.send_header("Content-Type", "text/event-stream")
+                self.send_header("Cache-Control", "no-cache")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                def sse(o):
+                    self.wfile.write(f"data: {json.dumps(o)}\n\n".encode()); self.wfile.flush()
+                try:
+                    trace = []; final = {"surface": [], "suppress": []}
+                    for ev in review_agent.run_review_stream(patient["id"], patient):
+                        if ev["type"] == "tool":
+                            trace.append({"tool": ev["tool"], "summary": ev["summary"]}); sse(ev)
+                        elif ev["type"] == "final":
+                            final = ev
+                    labs2 = sorted(patient["labs"], key=lambda l: l["date"]); lab2 = labs2[-1]
+                    ckd = core.meets_ckd_definition(lab2["egfr"], lab2["acr_mg_g"], patient.get("haematuria"), patient.get("structural_marker"))
+                    stg = core.stage_patient(lab2["egfr"], lab2["acr_mg_g"]); traj = core.egfr_trajectory(labs2); ref = core.referral_recommendation(patient)
+                    result = decorate(final["surface"], final["suppress"], trace, ckd,
+                                      stg["stage"] if ckd else None, stg["risk_tier"] if ckd else None,
+                                      ref["kfre_5yr_pct"], traj.get("rapid"), engine="Claude agent (live tool-calling)")
+                    sse({"type": "result", "result": result})
+                except Exception as e:
+                    try: sse({"type": "error", "error": str(e)})
+                    except Exception: pass
+                return
             if self.path == "/api/review":
                 if b.get("live"):
                     try:

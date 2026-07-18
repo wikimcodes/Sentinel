@@ -174,6 +174,81 @@ def run_review(patient_id: str, verbose: bool = False, patient: dict = None) -> 
     return {"surface": [], "suppress": [], "trace": trace}
 
 
+def run_review_stream(patient_id: str, patient: dict = None):
+    """Generator variant of run_review — yields one event per real tool call as it
+    happens, then a final event. Powers the live SSE 'watch the agent work' stream."""
+    import anthropic
+    if patient is not None:
+        _PATIENTS[patient_id] = patient
+    client = anthropic.Anthropic()
+    p = _PATIENTS[patient_id]
+    user = (f"Review patient '{patient_id}'.\n"
+            f"Age {p['age']}, sex {p['sex']}, diabetes: {p['diabetes']}, problems: {p.get('problems')}.\n"
+            f"Medications: {[m['name'] for m in p['medications']]}.\n"
+            f"Use the tools to gather the facts, then submit_review.")
+    messages = [{"role": "user", "content": user}]
+    for _ in range(12):
+        resp = client.messages.create(model=MODEL, max_tokens=8000, thinking={"type": "adaptive"},
+                                      output_config={"effort": "high"}, system=SYSTEM, tools=TOOL_SCHEMAS, messages=messages)
+        messages.append({"role": "assistant", "content": resp.content})
+        if resp.stop_reason != "tool_use":
+            yield {"type": "final", "surface": [], "suppress": []}; return
+        results = []
+        for block in resp.content:
+            if block.type != "tool_use":
+                continue
+            if block.name == "submit_review":
+                yield {"type": "final", "surface": block.input.get("surface", []),
+                       "suppress": block.input.get("suppress", [])}
+                return
+            fn = CORE_TOOLS.get(block.name)
+            out = fn(block.input["patient_id"]) if fn else {"error": "unknown tool"}
+            yield {"type": "tool", "tool": block.name, "summary": _summ(block.name, out)}
+            results.append({"type": "tool_result", "tool_use_id": block.id, "content": json.dumps(out)})
+        messages.append({"role": "user", "content": results})
+    yield {"type": "final", "surface": [], "suppress": []}
+
+
+ASK_SYSTEM = """You are Sentinel, a CKD decision-support agent (KDIGO 2024). Answer the clinician's
+question about THIS patient, grounding every number in the tools — never invent a value.
+
+Format for fast reading, NOT a wall of text:
+- Open with the single most important answer as ONE short bold line, e.g. **Start an SGLT2 inhibitor.**
+- Then 1–3 concise supporting points, each on its own line starting with "- " (one clause each).
+- Keep the whole answer under ~65 words. No preamble, do not restate the question.
+
+You are decision support with a human in the loop: you propose, the clinician decides."""
+
+def ask(patient_id: str, question: str, patient: dict = None) -> dict:
+    """Conversational agent: answers a clinician's question by calling the core tools."""
+    import anthropic
+    if patient is not None:
+        _PATIENTS[patient_id] = patient
+    client = anthropic.Anthropic()
+    p = _PATIENTS[patient_id]
+    tools = [t for t in TOOL_SCHEMAS if t["name"] != "submit_review"]
+    messages = [{"role": "user", "content": f"Patient '{patient_id}' — {p['age']}{p['sex']}, diabetes {p['diabetes']}, "
+                 f"problems {p.get('problems')}. Question: {question}"}]
+    used = []
+    for _ in range(8):
+        resp = client.messages.create(model=MODEL, max_tokens=1500, thinking={"type": "adaptive"},
+                                      system=ASK_SYSTEM, tools=tools, messages=messages)
+        messages.append({"role": "assistant", "content": resp.content})
+        if resp.stop_reason != "tool_use":
+            text = "".join(b.text for b in resp.content if b.type == "text").strip()
+            return {"answer": text or "(no answer)", "tools": used}
+        results = []
+        for block in resp.content:
+            if block.type != "tool_use":
+                continue
+            fn = CORE_TOOLS.get(block.name)
+            out = fn(block.input["patient_id"]) if fn else {"error": "unknown tool"}
+            used.append(block.name)
+            results.append({"type": "tool_result", "tool_use_id": block.id, "content": json.dumps(out)})
+        messages.append({"role": "user", "content": results})
+    return {"answer": "(reasoning did not converge)", "tools": used}
+
+
 def agent_predict(patient: dict) -> dict:
     """Predictor entry point for evals/score.py."""
     return run_review(patient["id"])

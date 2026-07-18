@@ -177,6 +177,17 @@ function TrendModal({ analyteKey, labs, onClose }) {
   );
 }
 
+// Minimal renderer: **bold** and "- " bullets, so agent answers read cleanly.
+function RichText({ text }) {
+  return (text || "").split(/\n+/).filter((l) => l.trim()).map((ln, i) => {
+    const bullet = /^\s*[-•*]\s+/.test(ln);
+    const body = ln.replace(/^\s*[-•*]\s+/, "");
+    const parts = body.split(/(\*\*[^*]+\*\*)/g).filter(Boolean).map((p, j) =>
+      /^\*\*[^*]+\*\*$/.test(p) ? <strong key={j}>{p.slice(2, -2)}</strong> : <span key={j}>{p}</span>);
+    return <p key={i} className={bullet ? "rt-li" : "rt-p"}>{parts}</p>;
+  });
+}
+
 // ---------------------------------------------------------------------------
 function EHRReview({ patient }) {
   const [labs, setLabs] = useState(() => sortedLabs(patient).map((l) => ({ ...l })));
@@ -192,6 +203,13 @@ function EHRReview({ patient }) {
   const [prescribed, setPrescribed] = useState([]);
   const [trendKey, setTrendKey] = useState(null);
   const [live, setLive] = useState(false);
+  const [liveTrace, setLiveTrace] = useState([]);
+  const [askQ, setAskQ] = useState("");
+  const [askThread, setAskThread] = useState([]);
+  const [askLoading, setAskLoading] = useState(false);
+  const [sms, setSms] = useState(null);
+  const [notifying, setNotifying] = useState(false);
+  const [askOpen, setAskOpen] = useState(false);
 
   const t = TIER[tierOf(patient)];
 
@@ -208,16 +226,66 @@ function EHRReview({ patient }) {
     markStale();
   }
 
+  const stamp = () => new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+
   async function runReview() {
-    setPhase("analyzing"); setResult(null); setSteps(0); setReferral(null); setPrescribed([]); setStale(false);
+    setPhase("analyzing"); setResult(null); setSteps(0); setReferral(null); setPrescribed([]);
+    setStale(false); setLiveTrace([]); setSms(null);
     const ordered = [...labs].sort((a, b) => a.date.localeCompare(b.date));
+
+    if (live) {   // stream the real Claude tool-calling loop
+      try {
+        const resp = await fetch("/api/review-stream", { method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ patient_id: patient.id, labs: ordered }) });
+        const reader = resp.body.getReader(); const dec = new TextDecoder(); let buf = "";
+        for (;;) {
+          const { done, value } = await reader.read(); if (done) break;
+          buf += dec.decode(value, { stream: true });
+          let idx;
+          while ((idx = buf.indexOf("\n\n")) >= 0) {
+            const dl = buf.slice(0, idx).split("\n").find((l) => l.startsWith("data:")); buf = buf.slice(idx + 2);
+            if (!dl) continue;
+            const ev = JSON.parse(dl.slice(5).trim());
+            if (ev.type === "tool") setLiveTrace((tr) => [...tr, ev]);
+            else if (ev.type === "result") setResult(ev.result);
+            else if (ev.type === "error") throw new Error(ev.error);
+          }
+        }
+      } catch {
+        const r = await fetch("/api/review", { method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ patient_id: patient.id, labs: ordered }) }).then((x) => x.json());
+        setResult(r);
+      }
+      setPhase("done"); setRanAt(stamp()); return;
+    }
+
     const r = await fetch("/api/review", { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ patient_id: patient.id, labs: ordered, live }) }).then((x) => x.json());
+      body: JSON.stringify({ patient_id: patient.id, labs: ordered }) }).then((x) => x.json());
     setResult(r);
     for (let i = 1; i <= r.trace.length; i++) { await sleep(360); setSteps(i); }
-    await sleep(240);
-    setPhase("done");
-    setRanAt(new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }));
+    await sleep(240); setPhase("done"); setRanAt(stamp());
+  }
+
+  async function submitAsk(e) {
+    e.preventDefault(); if (!askQ.trim() || askLoading) return;
+    const q = askQ; setAskQ(""); setAskLoading(true);
+    const ordered = [...labs].sort((a, b) => a.date.localeCompare(b.date));
+    try {
+      const r = await fetch("/api/ask", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ patient_id: patient.id, labs: ordered, question: q }) }).then((x) => x.json());
+      setAskThread((th) => [...th, { q, a: r.answer, tools: r.tools }]);
+    } catch { setAskThread((th) => [...th, { q, a: "Sentinel is unavailable.", tools: [] }]); }
+    setAskLoading(false);
+  }
+
+  async function notifyPatient() {
+    setNotifying(true);
+    try {
+      const r = await fetch("/api/notify-patient", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ patient_id: patient.id }) }).then((x) => x.json());
+      setSms(r);
+    } catch { setSms(null); }
+    setNotifying(false);
   }
 
   async function generateReferral() {
@@ -322,15 +390,15 @@ function EHRReview({ patient }) {
         </div>
       </div>
 
-      {result && (
+      {(result || liveTrace.length > 0) && (
         <div className="trace">
           <div className="trace-head"><span className="pulse" data-run={phase === "analyzing"} />
             <h4>Agent activity — checking the record against the guideline logic</h4>
-            {result.engine && <span className={`engine ${result.engine.startsWith("Claude") ? "live" : ""}`}>{result.engine}</span>}</div>
-          {result.trace.slice(0, phase === "done" ? result.trace.length : steps).map((s, i) => (
+            <span className={`engine ${(result?.engine || "").startsWith("Claude") || (live && !result) ? "live" : ""}`}>{result?.engine || "Claude agent (live tool-calling)"}</span></div>
+          {(phase === "analyzing" && live ? liveTrace : (result ? result.trace.slice(0, phase === "done" ? result.trace.length : steps) : [])).map((s, i) => (
             <div className="trace-row" key={i}><code>{s.tool}</code><span className="arrow">→</span><span>{s.summary}</span></div>
           ))}
-          {phase === "analyzing" && steps < result.trace.length && <div className="trace-row dim">…</div>}
+          {phase === "analyzing" && <div className="trace-row dim">…</div>}
         </div>
       )}
 
@@ -372,6 +440,20 @@ function EHRReview({ patient }) {
                   </div>
                 );
               })}
+              <div className="card action outreach" style={{ borderLeftColor: "#7a4fd0" }}>
+                <div className="card-top"><span className="tag" style={{ background: "#7a4fd0" }}>Patient outreach</span></div>
+                <p className="card-body">Invite the patient to book a review appointment.</p>
+                {sms ? (
+                  <div className="sms-mock">
+                    <div className="sms-head">✓ Message sent to {sms.to}</div>
+                    <div className="sms-bubble">{sms.message}</div>
+                    <div className="sms-foot">{sms.source === "claude" ? "written live by Sentinel" : "template"} · patient can reply BOOK to schedule</div>
+                  </div>
+                ) : (
+                  <button className="act" onClick={notifyPatient} disabled={notifying}>
+                    {notifying ? "Sending…" : "✉ Message patient to book"}</button>
+                )}
+              </div>
             </div>
 
             <div className="col moat">
@@ -396,6 +478,39 @@ function EHRReview({ patient }) {
           labs={[...labs].sort((a, b) => a.date.localeCompare(b.date))}
           onClose={() => setTrendKey(null)} />
       )}
+
+      {/* Floating Ask Sentinel agent */}
+      <div className="ask-fab">
+        {askOpen && (
+          <div className="ask-panel">
+            <div className="ask-panel-head">
+              <span className="ap-mark">S</span>
+              <div className="ap-title"><strong>Ask Sentinel</strong><small>{patient.name} · reasons over the tools</small></div>
+              <button className="ap-x" onClick={() => setAskOpen(false)} aria-label="Close">✕</button>
+            </div>
+            <div className="ask-panel-body">
+              {askThread.length === 0 && !askLoading && (
+                <p className="ap-hint">Ask anything about this patient — e.g. <em>“Would an ACE inhibitor be safe here?”</em> or <em>“What if her K⁺ were 5.6?”</em></p>
+              )}
+              {askThread.map((qa, i) => (
+                <div className="qa" key={i}>
+                  <p className="qa-q">{qa.q}</p>
+                  <div className="qa-a"><RichText text={qa.a} /></div>
+                  {qa.tools && qa.tools.length ? <p className="qa-tools">Reasoned via {[...new Set(qa.tools)].join(" · ")}</p> : null}
+                </div>
+              ))}
+              {askLoading && <p className="qa-a dim">Sentinel is reasoning through the tools…</p>}
+            </div>
+            <form className="ask-panel-form" onSubmit={submitAsk}>
+              <input value={askQ} onChange={(e) => setAskQ(e.target.value)} placeholder="Ask about this patient…" autoFocus />
+              <button type="submit" disabled={askLoading || !askQ.trim()}>➤</button>
+            </form>
+          </div>
+        )}
+        <button className={`fab-btn ${askOpen ? "on" : ""}`} onClick={() => setAskOpen((o) => !o)} title="Ask Sentinel">
+          {askOpen ? "✕" : "S"}
+        </button>
+      </div>
     </section>
   );
 }

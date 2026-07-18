@@ -438,3 +438,63 @@ h1 { font-size: 27px; } h2 { font-size: 26px; }
 .pb-chip { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 7px; background: var(--surface-2); border: 1px solid var(--border); white-space: nowrap; }
 .pb-chip.allergy { color: var(--ok); border-color: var(--ok); }
 .pb-chip.warn { background: rgba(217,119,6,.14); border-color: var(--warn); color: var(--warn); }
+
+/* ============ Ask Sentinel + patient message ============ */
+.agent-actions { margin-top: 10px; }
+.act.ghost { background: var(--surface); color: var(--accent); border: 1.5px solid var(--accent); box-shadow: none; }
+.act.ghost:hover { background: var(--accent-soft); }
+
+.sms-mock { max-width: 340px; margin: 12px 0 0; }
+.sms-head { font-size: 12px; color: var(--ok); font-weight: 600; margin-bottom: 6px; }
+.sms-bubble { background: #e7f3ff; color: #0a2540; border-radius: 18px 18px 18px 6px; padding: 11px 14px;
+  font-size: 13.5px; line-height: 1.45; border: 1px solid #cfe4fb; }
+.sms-foot { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
+
+.ask { display: flex; gap: 8px; margin-top: 14px; }
+.ask-in { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+  padding: 10px 16px; font: 13.5px var(--sans); color: var(--text); outline: none; }
+.ask-in:focus { border-color: var(--accent); }
+.ask-btn { background: var(--accent); color: #fff; border: none; border-radius: 999px; padding: 0 20px;
+  font: 600 13.5px var(--sans); cursor: pointer; }
+.ask-btn:disabled { opacity: .5; cursor: default; }
+.ask-thread { margin-top: 12px; display: flex; flex-direction: column; gap: 12px; }
+.qa-q { margin: 0 0 4px; font-weight: 600; font-size: 13.5px; }
+.qa-q::before { content: "Q "; color: var(--accent); font-weight: 800; }
+.qa-a { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--text); background: var(--surface-2);
+  border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 9px 13px; }
+.qa-a.dim { color: var(--text-dim); font-style: italic; }
+.qa-tools { color: var(--text-dim); font-size: 11.5px; }
+
+/* ============ Floating Ask Sentinel agent ============ */
+.ask-fab { position: fixed; right: 24px; bottom: 24px; z-index: 60; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+.fab-btn { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: #fff; border: none;
+  font-family: var(--serif); font-style: italic; font-weight: 700; font-size: 24px; cursor: pointer;
+  box-shadow: 0 10px 28px rgba(239,70,35,.4); transition: transform .3s var(--ease); }
+.fab-btn:hover { transform: scale(1.06) rotate(-4deg); }
+.fab-btn.on { font-family: var(--sans); font-style: normal; font-size: 18px; }
+.ask-panel { width: min(380px, 92vw); height: 480px; max-height: 72vh; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 22px; box-shadow: 0 18px 50px rgba(45,59,66,.28);
+  display: flex; flex-direction: column; overflow: hidden; animation: fadeUp .25s var(--ease); }
+.ask-panel-head { display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-bottom: 1px solid var(--border); }
+.ap-mark { width: 32px; height: 32px; border-radius: 9px; background: var(--accent); color: #fff; display: grid; place-items: center;
+  font-family: var(--serif); font-style: italic; font-weight: 700; font-size: 16px; }
+.ap-title { flex: 1; display: flex; flex-direction: column; line-height: 1.2; }
+.ap-title strong { font-size: 15px; }
+.ap-title small { font-size: 11.5px; color: var(--text-dim); }
+.ap-x { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); width: 28px; height: 28px; border-radius: 8px; cursor: pointer; }
+.ask-panel-body { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+.ap-hint { color: var(--text-dim); font-size: 13px; line-height: 1.55; margin: 0; }
+.ask-panel-form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--border); }
+.ask-panel-form input { flex: 1; border: 1px solid var(--border); border-radius: 999px; padding: 9px 14px; font: 13.5px var(--sans); color: var(--text); background: var(--surface-2); outline: none; }
+.ask-panel-form input:focus { border-color: var(--accent); }
+.ask-panel-form button { background: var(--accent); color: #fff; border: none; border-radius: 50%; width: 38px; height: 38px; cursor: pointer; font-size: 14px; flex-shrink: 0; }
+.ask-panel-form button:disabled { opacity: .5; }
+.card.action.outreach .sms-mock { margin-top: 10px; }
+
+/* readable agent answers */
+.qa-a .rt-p, .qa-a .rt-li { margin: 0 0 6px; }
+.qa-a .rt-p:last-child, .qa-a .rt-li:last-child { margin-bottom: 0; }
+.qa-a .rt-li { padding-left: 15px; position: relative; }
+.qa-a .rt-li::before { content: "•"; color: var(--accent); position: absolute; left: 2px; font-weight: 700; }
+.qa-a strong { font-weight: 700; }
+.qa-tools { margin: 6px 0 0; font-size: 11px; color: var(--text-dim); text-transform: none; }
