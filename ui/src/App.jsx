@@ -757,7 +757,11 @@ export default function App() {
 
   const rows = useMemo(() => {
     if (!patients) return [];
-    return [...patients].sort((a, b) => TIER[tierOf(a)].rank - TIER[tierOf(b)].rank
+    const trigDate = (p) => (p.trigger && p.trigger.date) || "";
+    // Default worklist order is "most recent" — newest between-visit trigger first —
+    // then sickest, then most open actions.
+    return [...patients].sort((a, b) => trigDate(b).localeCompare(trigDate(a))
+      || TIER[tierOf(a)].rank - TIER[tierOf(b)].rank
       || b.expected.surface.length - a.expected.surface.length);
   }, [patients]);
 

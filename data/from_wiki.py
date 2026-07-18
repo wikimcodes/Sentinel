@@ -65,7 +65,8 @@ def build(wp):
 
     meds = [{"name": m, "dose": DOSE.get(m, ""), "class": MED_CLASS.get(m, "other")} for m in wp["medications"]]
 
-    p = {"id": wp["id"], "name": f"{rng.choice(FIRST_M if sex == 'M' else FIRST_F)} {rng.choice(LAST)}",
+    name = wp.get("name") or f"{rng.choice(FIRST_M if sex == 'M' else FIRST_F)} {rng.choice(LAST)}"
+    p = {"id": wp["id"], "name": name,
          "age": wp["demographics"]["age"], "sex": sex, "diabetes": dm,
          "problems": wp.get("context", []), "labs": labs, "medications": meds}
     if "haematuria" in ctx: p["haematuria"] = True
@@ -101,6 +102,10 @@ def build(wp):
     p["source"] = "wiki"
     p["wiki_expected"] = wp["expected"]     # keep Wiki's ground truth for reference
     p["expected"] = expected
+    if wp.get("trigger"):                   # between-visit trigger event — drives most-recent sort
+        p["trigger"] = wp["trigger"]
+    if wp.get("summary"):
+        p["summary"] = wp["summary"]
     return p
 
 patients = [build(wp) for wp in WIKI]
