@@ -815,7 +815,7 @@ export default function App() {
             <span className="mag">⌕</span>
             <input placeholder="Search patients…" value={q} onChange={(e) => { setQ(e.target.value); setView("panel"); }} />
           </div>
-          <div className="userchip"><span className="user-av">RA</span><span className="user-meta"><strong>Dr. Rao</strong><small>Nephrology</small></span></div>
+          <div className="userchip"><span className="user-av">RA</span><span className="user-meta"><strong>Dr. Rao</strong><small>Family Medicine</small></span></div>
         </div>
       </header>
 
