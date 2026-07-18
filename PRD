@@ -1,0 +1,185 @@
+ # CKD Between-Visit Agent
+### Product Requirements Document · v2.0
+
+**Event:** Abridge × Anthropic × Lightspeed × Cerebral Valley — "Build Agents for Healthcare Clinics"
+**Date:** 18 July 2026 · in-person, San Francisco (Shack15) · team ≤ 2
+**Status:** Spec to build against in-room (no functional code shipped in advance)
+**Guideline basis:** KDIGO 2024 CKD (finalised); KDIGO 2026 Diabetes-and-CKD update noted as direction of travel
+
+---
+
+## 1. One-liner
+
+An agent that runs the between-visit clinical review no clinician has time to run — for one chronic condition, chronic kidney disease. It reasons over a patient's longitudinal record, catches a slow decline that's invisible value-by-value but obvious across years, flags a now-indicated treatment the patient isn't on, produces a prioritised action list plus a draft referral, and — critically — knows what *not* to surface, so a clinician actually trusts it.
+
+## 2. Product vision
+
+Abridge captured the highest-value fifteen minutes in medicine — the visit — and turned the conversation into structured data. But chronic disease isn't managed in the visit; it's managed in the 364 days *between* visits, where today almost nothing happens: no monitoring, no titration, no escalation until the patient deteriorates and shows up in the emergency department. That gap is where the majority of chronic-disease cost and morbidity accrues.
+
+The thesis is that this between-visit layer can be run by an agent: continuously ingesting labs, devices, medications and symptoms; reasoning longitudinally; escalating only what needs a human. This is agentic in the sense that matters — it replaces *labour* (the care-coordinator workflow that doesn't scale), not just assists with a task — and it compounds, because every patient-year of longitudinal reasoning makes the next decision better.
+
+CKD is the ideal first wedge: clear labs, clear guidelines, clear deterioration signals, and a genuine, catchable under-treatment pattern in the real world. The narrow, deep slice implies the platform. Big vision, narrow knife.
+
+## 3. Problem statement
+
+Chronic kidney disease affects roughly one in seven adults, is usually silent until late, and is driven mostly by diabetes and hypertension. Most people with CKD stage 3–4 die of cardiovascular disease before they ever reach dialysis, which makes CKD a cardiovascular risk multiplier as much as a kidney problem. Three specific failures happen between visits:
+
+The **slow decline goes unseen.** An eGFR falling ~6 mL/min/year looks "normal-ish" at every single visit; no one is fitting the trend across years, so the patient crosses into a high-risk stage unnoticed.
+
+The **now-indicated drug is never started.** The clearest real-world example is the non-diabetic albuminuric patient who qualifies for an SGLT2 inhibitor but was never started, because the drug is still mentally filed under "diabetes." This is a cardiorenal-protective drug the patient should be on and isn't.
+
+The **existing tools cry wolf.** Naive rule engines flag every dip and every gap, including the ones that are benign or unsafe to action, so clinicians stop trusting them and switch them off. The scarce resource is not detection — it's *trustworthy* detection.
+
+## 4. Goals & success metrics
+
+The product goal is a clinician-usable between-visit review for a CKD panel. The hackathon goal is to win the room. Both are served by the same build, and the metrics below map deliberately onto the judging rubric.
+
+| Rubric dimension (approx. weighting) | What we must show | How this PRD delivers it |
+|---|---|---|
+| Impact (~20%) | A real pain point at scale | Between-visit review across a whole patient panel, not one chart |
+| Technical complexity (~20%) | Genuinely engineered, not if-statements-plus-a-chatbot | Real agentic loop planning and calling deterministic tools; longitudinal reasoning; an eval harness as evidence of rigour |
+| Clinical credibility | Something a clinician could use Monday | Deterministic guideline core with testable thresholds; human-in-the-loop; drafted (not sent) referral |
+| Originality | Not a banned pattern | Deterministic guideline encoding + a suppression layer no generic wrapper builds — explicitly *not* RAG |
+
+Concrete success criteria for the demo: the agent triages a small panel; surfaces exactly three prioritised items on the hero patient; produces a draft referral; and shows a suppression panel of what it considered and deliberately withheld, each with a one-line reason. The eval harness reports correct surfaces and correct suppressions against a scored gold set.
+
+> **Rules note.** The competition restricts the *project* (code, features, functionality must be built during the event) and presenting existing work as new. A PRD, research, clinical knowledge, and a master build prompt are all planning artifacts and are fine to bring. This document is therefore a spec — requirements, rules, thresholds, and pseudocode-level logic — and deliberately contains no finished implementation. The working repo is built in the room.
+
+## 5. Users
+
+**Primary user — the clinician** (GP, nephrology-adjacent physician) managing a panel of chronic patients with no time to review each longitudinally between visits. They need to open a view each morning and see, per patient, what changed, what's now indicated, and what needs escalation — with enough reasoning shown that they can trust or overrule it in seconds. They will switch off anything that nags.
+
+**Secondary beneficiary — the patient**, whose slow decline or missing cardiorenal-protective drug is caught months earlier than it otherwise would be.
+
+**Explicit non-user:** the agent is not patient-facing and does not prescribe. It is decision support with a human in the loop.
+
+## 6. Product scope
+
+### 6.1 What the agent does (in scope)
+
+The agent ingests a patient's longitudinal record (time-ordered labs, medications, problems, and — as the Abridge tie-in — a visit note as the trigger/input). It then runs four functions and produces a prioritised output:
+
+1. **Risk-stratify** each patient by KDIGO CGA staging (the heat-map tier).
+2. **Detect trajectory** — fit the eGFR slope over steady-state values and flag meaningful progression.
+3. **Detect gaps** — cross-reference stage and labs against guideline indications and the current medication list to find a now-indicated treatment the patient isn't on.
+4. **Suppress** — decide what *not* to surface, and log why.
+
+Output per patient: a ranked action list (most important first), a draft referral letter when criteria are met, and a suppression panel. Escalate to the clinician only what needs a human.
+
+### 6.2 Out of scope (for this build)
+
+Autonomous prescribing or ordering; sending anything (referrals are drafted, not transmitted); real EHR/FHIR integration (synthetic data only); conditions other than CKD; patient-facing interfaces; any real PHI. These are roadmap, not MVP.
+
+## 7. The demo we build toward
+
+One hero flow, rehearsed to fit ~3 minutes live plus 1–2 minutes Q&A, with a separate 1-minute submission video.
+
+Open on a **panel view** — a handful of synthetic patients triaged into risk tiers, establishing "this runs across a population, not one chart." Click into the **hero patient**: a non-diabetic with albuminuria whose eGFR has drifted 78 → 51 over four years. The agent surfaces exactly three things:
+
+1. **The longitudinal catch** — "eGFR declined 78 → 51 over 4 years, ~6 mL/min/yr, now G3b" — invisible at any single visit.
+2. **The gap** — "Albuminuric CKD, eGFR ≥20: SGLT2 inhibitor indicated and not prescribed" — the cardiorenal drug never started because the patient isn't diabetic.
+3. **The draft referral** — auto-composed with the KFRE-based rationale.
+
+Then reveal the **suppression panel** — the centrepiece — showing what the agent considered and deliberately withheld: the AKI dip during a chest infection (non-steady-state), the creatinine bump on a trimethoprim course (pseudo-rise), the statin the patient is already on (don't nag). Close on one line of architecture: a deterministic clinical core the model plans over but cannot overrule.
+
+The emotional beat is the longitudinal catch; the credibility beat is the suppression panel.
+
+## 8. Clinical logic specification
+
+Written to KDIGO 2024 as testable rules. Thresholds below are the contract the implementation must satisfy; confirm exact drug cut-points against the guideline PDF when online. Staging is stable and safe to hard-code.
+
+### 8.1 CGA staging (risk-stratification engine)
+
+GFR category from eGFR (mL/min/1.73m²): G1 ≥90 · G2 60–89 · G3a 45–59 · G3b 30–44 · G4 15–29 · G5 <15.
+
+Albuminuria category from urine ACR: A1 <30 mg/g (<3 mg/mmol) · A2 30–300 (3–30) · A3 >300 (>30).
+
+Risk tier (KDIGO GxA grid): green (low) for G1–G2 + A1; yellow (moderate) for G1–G2 + A2 and G3a + A1; orange (high) for G1–G2 + A3, G3a + A2, G3b + A1; red (very high) for G3a + A3, G3b + A2/A3, and all of G4–G5.
+
+**CKD definition gate:** eGFR <60 OR a damage marker (ACR ≥30, haematuria, structural/imaging or other marker) persisting ≥3 months. A single abnormal value is not CKD; G1/G2 + A1 with no marker is not CKD and must not be surfaced.
+
+### 8.2 Trajectory detection
+
+Fit eGFR slope by simple linear regression over time-ordered, steady-state values (report mL/min/1.73m² per year). Flag **rapid progression** at sustained decline ≥5 mL/min/year. Flag **KDIGO-defined progression** when a GFR-category drop is accompanied by a ≥25% fall from baseline (category crossing alone is not enough). Exclude non-steady-state points (see 8.4).
+
+### 8.3 Gap detection (now-indicated, not prescribed)
+
+Fire a gap only when indicated AND not already prescribed AND not blocked by a safety rule.
+
+| Drug | Indication (gap trigger) | Safety / nuance |
+|---|---|---|
+| RAS inhibitor (ACEi/ARB) | Albuminuric CKD (A2/A3), esp. with hypertension; titrate to max | Accept creatinine rise <30% / eGFR fall <25% on initiation; don't stop below eGFR 30; never combine ACEi + ARB; stop if K⁺ >6.0 |
+| SGLT2 inhibitor | eGFR ≥20 AND ACR ≥200 mg/g; or CKD + heart failure at any ACR; or T2D + CKD. **Non-diabetics included** | Small initial eGFR dip is expected/benign — not progression (see suppression) |
+| Statin | Adults ≥50 with CKD (younger with added risk) | CV-risk reduction; high-frequency easy catch |
+| Finerenone (nsMRA) | T2D + CKD + albuminuria, on max RASi, K⁺ normal, eGFR ≥25 | Diabetes-focused; do not gate a non-diabetic hero patient on it |
+
+BP target: KDIGO standardised office SBP <120 mmHg when tolerated (note the US/UK divergence — NICE uses <140/90, tightening to <130/80 if ACR ≥70 mg/mmol).
+
+### 8.4 Suppression rules (the moat — highest priority)
+
+Suppress, and log a one-line reason, when any of the following hold:
+
+- **Non–steady-state:** an eGFR drop coincides with acute illness / AKI / volume depletion — unreliable, not progression.
+- **Resolved AKI:** an in-hospital nadir that recovered to baseline is not a progression signal.
+- **eGFR failure modes:** extremes of muscle mass (cachexia, amputee, bodybuilder) or creatinine-secretion blockers causing pseudo-rise (trimethoprim, cimetidine) — output "confirm with cystatin C," do not act on the number.
+- **Already optimised:** patient already on the indicated drug — no nag.
+- **Not CKD:** G1/G2 + A1 with no damage marker — normal kidney, don't surface.
+- **Safety gate (surface but hold):** drug indicated but a safety parameter blocks initiation (e.g. K⁺ ≥5.5 for RASi/nsMRA) — surface as "indicated, gated on hyperkalaemia — treat K⁺ first," not a clean "start drug."
+
+### 8.5 Referral logic
+
+Draft a referral when nephrology-referral criteria are met: KFRE 5-year kidney-failure risk ≥5% (from age, sex, eGFR, ACR), or eGFR <30, or ACR >300 mg/g (>70 mg/mmol), or rapid progression. The draft states the triggering criterion and the supporting trajectory in plain language. Even a simple KFRE-style output signals current practice.
+
+## 9. Architecture
+
+The design principle is a hard split between deterministic clinical logic and probabilistic language reasoning, with a human in the loop. This is the spine of both the safety story and the pitch.
+
+**Deterministic clinical core.** All staging, slope-fitting, threshold checks, and suppression rules live in tested functions. Every number in the output originates here. If a figure appears that the core didn't compute, that's a bug. This is what makes the system trustable and is more rigorous than feeding guidelines to a model and hoping.
+
+**Agent layer.** The LLM plans and orchestrates: it reads the record, decides which core functions to call, sequences the longitudinal reasoning, composes the ranked action list and the referral prose, and explains its reasoning. Each deterministic function is exposed to the model as a tool (name, description, typed parameters). The model never invents thresholds; it calls the core.
+
+**Eval harness.** A loop that runs the core (and, where connectivity allows, the full agent) over the gold set and scores correct surfaces and correct suppressions. This is the evidence-of-rigour artifact — quantified correctness is what separates this from a demo that merely looks convincing.
+
+**Human-in-the-loop.** Decision support, not autonomous prescribing. The clinician validates and takes responsibility; the agent escalates only what needs a human. State this out loud — LLMs are probabilistic, medicine demands predictable outcomes, so the deterministic core plus the clinician in the loop is the safety architecture.
+
+**Why not RAG.** Basic RAG applications are out of scope for the competition and would be the wrong tool anyway. The guideline logic is encoded as testable thresholds the model cannot override, which is stronger than retrieving guideline text and letting the model interpret it. Frame the deterministic encoding as the differentiator, never as retrieval.
+
+**Abridge positioning.** The visit note Abridge's ambient layer generates is the *input* to this agent: the visit ends, Moya runs the plan continuously until the next one. That's the natural extension Abridge can't reach from inside the exam room — a partnership shape, not a competitive one. If time allows, show an Abridge-style note flowing into the agent.
+
+## 10. Data
+
+Ten hand-authored synthetic patients stored as a single JSON file, doubling as demo material and the eval set. No real PHI, ever. Each record carries time-ordered labs (eGFR, ACR, K⁺, dates), a medication list, problems (incl. diabetes status), and an `expected` block describing correct behaviour (which items should surface, which should be suppressed, and why) that the eval harness scores against.
+
+The set must include: the hero patient (non-diabetic, albuminuric, drifting eGFR, no SGLT2i); an AKI-dip patient (acute drop that recovered); a pseudo-rise patient (trimethoprim course); an already-optimised patient (on all indicated drugs — should surface nothing); a not-CKD patient (G2 A1, no marker); and a safety-gated patient (drug indicated but K⁺ high).
+
+## 11. Tech stack
+
+React front end (framed as an agent surface, not a dashboard) with three panels: ranked actions, draft referral, and the suppression panel. Python deterministic core with the clinical functions and the eval harness. Claude via the API as the agent/orchestration layer with tool-calling over the core functions. Mock the API call behind a one-line swap so the UI renders offline from fixed output, then wire the live model in the room. Keep the arithmetic in code, never in the model.
+
+## 12. Build plan (in-room, with offline prep)
+
+Offline (flight): finalise this PRD; author the gold dataset JSON; write the deterministic core and its unit tests as a spec/pseudocode; draft the eval harness; write the agent scaffolding that can't yet run (system prompt, tool schemas, output templates) with a stubbed API call; sketch the three-panel React UI driven by mock output; write and rehearse the demo script.
+
+In-room (online): stand up the repo fresh; implement the core and pass its tests; wire Claude + tool-calling and swap the stub; run the gold set end-to-end through the eval harness; polish the suppression panel; rehearse to time. Depth over breadth — one pathway, one hero patient, three surfaced items.
+
+## 13. Risks & mitigations
+
+**Rules compliance.** Mitigate by building the repo fresh in-room and keeping this document a spec, not a codebase; bring planning artifacts only.
+
+**Looks like if-statements plus a chatbot.** Mitigate by showing the real agentic loop (model planning and calling tools), the longitudinal reasoning, and the eval harness — and by leading the architecture explanation with the deterministic-core split.
+
+**Alert fatigue / loss of trust.** Mitigate with the suppression layer as a first-class, demoed feature; the product's value is what it withholds.
+
+**Model invents a threshold.** Mitigate by keeping all arithmetic in the deterministic core; any number not from the core is a bug and a judge-killer.
+
+**Over-scoping.** Mitigate by locking to one pathway, one hero patient, three surfaced items; resist adding conditions or features.
+
+**Clinical inaccuracy under a nephrology-literate judge.** Mitigate by building to confirmed KDIGO 2024 thresholds, and by framing the honest boundary: depth is in longitudinal stratification and the between-visit gap, which is exactly what the agent addresses.
+
+## 14. Roadmap (post-hackathon)
+
+Additional pathways (diabetes, heart failure — the same longitudinal engine); real EHR/FHIR ingestion; device and wearable feeds; the KDIGO 2026 combination-therapy logic (SGLT2i + nonsteroidal MRA) once finalised; and, eventually, the continuous panel-management layer that is Moya's franchise.
+
+## 15. Appendix — recency flex for the pitch
+
+Build to the finalised **KDIGO 2024 CKD** guideline. Separately, name the **KDIGO 2026 Diabetes-and-CKD** update (public review in 2026) as a paradigm shift toward a 1A finerenone recommendation and early combination therapy (SGLT2i + nonsteroidal MRA), underpinned by trials like CONFIDENCE (finerenone + empagliflozin). Don't gate the non-diabetic hero patient on finerenone; naming the direction reads as tracking the literature in real time.
