@@ -1,0 +1,5926 @@
+{
+  "meta": {
+    "name": "Sentinel \u2014 CKD between-visit gold set (personas \u00b7 JTBD \u00b7 evals)",
+    "version": "2.0",
+    "n": 50,
+    "guideline_basis": "KDIGO 2024 CKD",
+    "personas": {
+      "amara": {
+        "role": "Panel GP",
+        "job": "See which patients changed between visits so I spend my minutes on the ones who matter."
+      },
+      "bola": {
+        "role": "Care-coordinating nurse",
+        "job": "Get a prioritised worklist of who needs a lab, a titration, or a referral so nothing slips."
+      },
+      "chen": {
+        "role": "Nephrology-adjacent reviewer",
+        "job": "See the reasoning and the ruled-out confounders so I can trust or overrule in seconds."
+      }
+    },
+    "jobs_to_be_done": {
+      "stratify": {
+        "persona": "amara",
+        "desc": "Place each patient on the KDIGO risk grid."
+      },
+      "catch": {
+        "persona": "amara",
+        "desc": "Surface the slow decline that's invisible visit-by-visit."
+      },
+      "close_gap": {
+        "persona": "bola",
+        "desc": "Name the now-indicated drug they're not on."
+      },
+      "escalate": {
+        "persona": "bola",
+        "desc": "Draft the referral when criteria are met."
+      },
+      "withhold": {
+        "persona": "chen",
+        "desc": "Show what was deliberately NOT surfaced, and why."
+      },
+      "gate": {
+        "persona": "chen",
+        "desc": "Never recommend starting a drug that's unsafe right now."
+      }
+    },
+    "categories": {
+      "C1_staging": "Staging & definition gate",
+      "C2_true_decline": "True rapid progression",
+      "C3_false_decline": "Suppress false decline (AKI / pseudo-rise / muscle)",
+      "C4_gap_fire": "Correct gap fire",
+      "C5_gap_nonfire": "Correct gap non-fire (optimised / below threshold)",
+      "C6_safety_gate": "Safety gating (hyperkalaemia)",
+      "C7_referral": "Referral fire / non-fire"
+    },
+    "thresholds": {
+      "rapid_slope_ml_min_yr": 5.0,
+      "k_gate": 5.5,
+      "sglt2_acr_mg_g": 200,
+      "referral_acr_mg_g": 620,
+      "kfre_referral": 0.05
+    },
+    "note": "expected blocks are ground truth from the clinical oracle in this file (KDIGO 2024). No real PHI."
+  },
+  "patients": [
+    {
+      "id": "hero-01",
+      "name": "Margaret H.",
+      "age": 62,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2022-03-11",
+          "egfr": 78,
+          "acr_mg_g": 260,
+          "potassium_mmol_l": 4.2,
+          "creatinine_mg_dl": 0.85
+        },
+        {
+          "date": "2023-04-02",
+          "egfr": 71,
+          "acr_mg_g": 285,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 0.92
+        },
+        {
+          "date": "2024-03-19",
+          "egfr": 63,
+          "acr_mg_g": 300,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.02
+        },
+        {
+          "date": "2025-03-08",
+          "egfr": 57,
+          "acr_mg_g": 315,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.1
+        },
+        {
+          "date": "2026-02-15",
+          "egfr": 51,
+          "acr_mg_g": 320,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.2
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        }
+      ],
+      "source": "anchor",
+      "tags": {
+        "category": "C2_true_decline",
+        "category_label": "True rapid progression",
+        "jtbd": "catch",
+        "jtbd_desc": "Surface the slow decline that's invisible visit-by-visit.",
+        "persona": "amara",
+        "persona_role": "Panel GP",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "trajectory",
+            "priority": 1,
+            "summary": "eGFR declined 78 -> 51 over 4 years (~6.8 mL/min/yr) \u2014 a slope invisible at any single visit, now G3a A3, very-high risk."
+          },
+          {
+            "type": "gap",
+            "drug": "SGLT2 inhibitor",
+            "priority": 2,
+            "summary": "Albuminuric CKD, eGFR >= 20: SGLT2 inhibitor indicated and NOT prescribed \u2014 the cardiorenal drug never started because the patient isn't diabetic."
+          },
+          {
+            "type": "referral",
+            "priority": 3,
+            "summary": "Draft nephrology referral \u2014 rapid progression + heavy albuminuria (ACR 320). KFRE-based rationale auto-composed."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 0.8
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "GORD"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-15",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-03-08",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "aki-01",
+      "name": "James O.",
+      "age": 58,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "CKD G3a"
+      ],
+      "labs": [
+        {
+          "date": "2024-06-10",
+          "egfr": 58,
+          "acr_mg_g": 25,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.35
+        },
+        {
+          "date": "2024-12-04",
+          "egfr": 56,
+          "acr_mg_g": 22,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.38
+        },
+        {
+          "date": "2025-08-21",
+          "egfr": 32,
+          "acr_mg_g": 28,
+          "potassium_mmol_l": 4.9,
+          "creatinine_mg_dl": 2.1,
+          "flags": [
+            "acute_illness"
+          ],
+          "context": "hospitalised with community-acquired pneumonia, volume depleted"
+        },
+        {
+          "date": "2025-09-15",
+          "egfr": 41,
+          "acr_mg_g": 26,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.72,
+          "context": "post-discharge, recovering"
+        },
+        {
+          "date": "2026-01-12",
+          "egfr": 57,
+          "acr_mg_g": 24,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.36
+        }
+      ],
+      "medications": [
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "anchor",
+      "tags": {
+        "category": "C3_false_decline",
+        "category_label": "Suppress false decline (AKI / pseudo-rise / muscle)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A1",
+        "risk_tier": "yellow",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "non_steady_state",
+            "item": "eGFR dip on 2025-08-21",
+            "reason": "Coincided with acute illness / volume depletion \u2014 non-steady-state, not progression."
+          },
+          {
+            "type": "resolved_aki",
+            "item": "trajectory",
+            "reason": "In-hospital nadir recovered to baseline \u2014 true trajectory is stable; do not flag progression."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 0.2
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Hypothyroidism",
+        "Obesity"
+      ],
+      "encounters": [
+        {
+          "date": "2026-01-12",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-09-15",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        },
+        {
+          "date": "2025-08-21",
+          "type": "Hospital admission",
+          "summary": "hospitalised with community-acquired pneumonia, volume depleted"
+        }
+      ]
+    },
+    {
+      "id": "pseudo-01",
+      "name": "Aisha R.",
+      "age": 66,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "CKD G3a",
+        "recurrent UTI"
+      ],
+      "labs": [
+        {
+          "date": "2024-05-14",
+          "egfr": 50,
+          "acr_mg_g": 40,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.16
+        },
+        {
+          "date": "2025-05-20",
+          "egfr": 49,
+          "acr_mg_g": 45,
+          "potassium_mmol_l": 4.7,
+          "creatinine_mg_dl": 1.18
+        },
+        {
+          "date": "2025-11-08",
+          "egfr": 40,
+          "acr_mg_g": 44,
+          "potassium_mmol_l": 4.8,
+          "creatinine_mg_dl": 1.45,
+          "flags": [
+            "trimethoprim_course"
+          ],
+          "context": "7-day trimethoprim course for UTI"
+        },
+        {
+          "date": "2026-01-19",
+          "egfr": 48,
+          "acr_mg_g": 42,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.2,
+          "context": "post-course"
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "5 mg",
+          "class": "ACEi"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "anchor",
+      "tags": {
+        "category": "C3_false_decline",
+        "category_label": "Suppress false decline (AKI / pseudo-rise / muscle)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A2",
+        "risk_tier": "orange",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "pseudo_rise",
+            "item": "creatinine rise on trimethoprim",
+            "reason": "Trimethoprim blocks tubular creatinine secretion \u2014 pseudo-rise, not true GFR decline. Confirm with cystatin C if it persists."
+          },
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.2 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "SGLT2 inhibitor",
+            "reason": "ACR 42 (< 200), no HF, non-diabetic \u2014 SGLT2 inhibitor not indicated."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 48 >= 30, ACR < 620, KFRE 0.4% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 0.4
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Former smoker",
+        "Obesity",
+        "Hypothyroidism"
+      ],
+      "encounters": [
+        {
+          "date": "2026-01-19",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-11-08",
+          "type": "GP consultation",
+          "summary": "Urinary tract infection \u2014 trimethoprim 200 mg BD for 7 days."
+        },
+        {
+          "date": "2025-11-08",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "optimised-01",
+      "name": "Robert K.",
+      "age": 70,
+      "sex": "M",
+      "diabetes": true,
+      "problems": [
+        "type 2 diabetes",
+        "hypertension",
+        "CKD G3b",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-06",
+          "egfr": 41,
+          "acr_mg_g": 350,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.72
+        },
+        {
+          "date": "2025-02-11",
+          "egfr": 39,
+          "acr_mg_g": 330,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.8
+        },
+        {
+          "date": "2026-02-03",
+          "egfr": 38,
+          "acr_mg_g": 340,
+          "potassium_mmol_l": 4.7,
+          "creatinine_mg_dl": 1.83
+        }
+      ],
+      "medications": [
+        {
+          "name": "losartan",
+          "dose": "100 mg",
+          "class": "ARB",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "finerenone",
+          "dose": "20 mg",
+          "class": "nsMRA"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "40 mg",
+          "class": "statin"
+        },
+        {
+          "name": "insulin glargine",
+          "dose": "24 U",
+          "class": "insulin"
+        }
+      ],
+      "source": "anchor",
+      "tags": {
+        "category": "C5_gap_nonfire",
+        "category_label": "Correct gap non-fire (optimised / below threshold)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.5 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "finerenone",
+            "reason": "Already on finerenone."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 38 >= 30, ACR < 620, KFRE 3.6% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 3.6
+      },
+      "comorbidities": [
+        "Type 2 diabetes mellitus",
+        "Hypertension",
+        "Chronic kidney disease",
+        "Atrial fibrillation",
+        "Former smoker"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-03",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-11",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "notckd-01",
+      "name": "Emily T.",
+      "age": 45,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [],
+      "labs": [
+        {
+          "date": "2024-01-22",
+          "egfr": 74,
+          "acr_mg_g": 8,
+          "potassium_mmol_l": 4.1,
+          "creatinine_mg_dl": 0.88
+        },
+        {
+          "date": "2025-01-18",
+          "egfr": 72,
+          "acr_mg_g": 10,
+          "potassium_mmol_l": 4.2,
+          "creatinine_mg_dl": 0.9
+        },
+        {
+          "date": "2026-01-20",
+          "egfr": 71,
+          "acr_mg_g": 9,
+          "potassium_mmol_l": 4.2,
+          "creatinine_mg_dl": 0.91
+        }
+      ],
+      "medications": [],
+      "source": "anchor",
+      "tags": {
+        "category": "C1_staging",
+        "category_label": "Staging & definition gate",
+        "jtbd": "stratify",
+        "jtbd_desc": "Place each patient on the KDIGO risk grid.",
+        "persona": "amara",
+        "persona_role": "Panel GP",
+        "difficulty": "easy"
+      },
+      "expected": {
+        "ckd": false,
+        "stage": null,
+        "risk_tier": null,
+        "surface": [],
+        "suppress": [
+          {
+            "type": "not_ckd",
+            "item": "patient",
+            "reason": "G2 A1 with no damage marker \u2014 does not meet the CKD definition gate; normal kidney, do not surface."
+          }
+        ]
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "GORD",
+        "Osteoarthritis",
+        "Obesity"
+      ],
+      "encounters": [
+        {
+          "date": "2026-01-20",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-01-18",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "gated-01",
+      "name": "David M.",
+      "age": 64,
+      "sex": "M",
+      "diabetes": true,
+      "problems": [
+        "type 2 diabetes",
+        "hypertension",
+        "CKD G3b",
+        "albuminuria",
+        "hyperkalaemia"
+      ],
+      "labs": [
+        {
+          "date": "2025-01-09",
+          "egfr": 40,
+          "acr_mg_g": 380,
+          "potassium_mmol_l": 5.2,
+          "creatinine_mg_dl": 1.75
+        },
+        {
+          "date": "2025-08-14",
+          "egfr": 37,
+          "acr_mg_g": 400,
+          "potassium_mmol_l": 5.6,
+          "creatinine_mg_dl": 1.88
+        },
+        {
+          "date": "2026-01-27",
+          "egfr": 36,
+          "acr_mg_g": 410,
+          "potassium_mmol_l": 5.7,
+          "creatinine_mg_dl": 1.92
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "5 mg",
+          "class": "ACEi",
+          "at_max": false
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "40 mg",
+          "class": "statin"
+        },
+        {
+          "name": "metformin",
+          "dose": "1 g",
+          "class": "biguanide"
+        }
+      ],
+      "source": "anchor",
+      "tags": {
+        "category": "C6_safety_gate",
+        "category_label": "Safety gating (hyperkalaemia)",
+        "jtbd": "gate",
+        "jtbd_desc": "Never recommend starting a drug that's unsafe right now.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "gap_gated",
+            "drug": "finerenone",
+            "priority": 1,
+            "summary": "Finerenone (nsMRA) indicated (T2D + albuminuric CKD, on RASi, eGFR 36 >= 25) but gated on K+ 5.7 (>= 5.5) \u2014 treat hyperkalaemia first."
+          },
+          {
+            "type": "safety",
+            "item": "hyperkalaemia",
+            "priority": 1,
+            "summary": "K+ 5.7 (>= 5.5) \u2014 address (dietary review, K-binder, review RASi dose) before adding a nsMRA or up-titrating RASi."
+          },
+          {
+            "type": "referral",
+            "priority": 3,
+            "summary": "Draft nephrology referral \u2014 trigger: KFRE 5-yr 5.5% >= 5%. (KFRE 5-yr 5.5%.)"
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~3.9 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "gated_hold",
+            "item": "finerenone",
+            "reason": "Indicated but gated on K+ 5.7 (>= 5.5) \u2014 treat hyperkalaemia first."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 5.5
+      },
+      "comorbidities": [
+        "Type 2 diabetes mellitus",
+        "Hypertension",
+        "Chronic kidney disease",
+        "Atrial fibrillation",
+        "Peripheral vascular disease"
+      ],
+      "encounters": [
+        {
+          "date": "2026-01-27",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-08-14",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "rapid-01",
+      "name": "Grace L.",
+      "age": 55,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "CKD",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2023-03-14",
+          "egfr": 55,
+          "acr_mg_g": 210,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.15
+        },
+        {
+          "date": "2024-03-12",
+          "egfr": 48,
+          "acr_mg_g": 250,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.3
+        },
+        {
+          "date": "2025-03-10",
+          "egfr": 41,
+          "acr_mg_g": 300,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.5
+        },
+        {
+          "date": "2026-03-05",
+          "egfr": 34,
+          "acr_mg_g": 335,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.78
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "anchor",
+      "tags": {
+        "category": "C2_true_decline",
+        "category_label": "True rapid progression",
+        "jtbd": "catch",
+        "jtbd_desc": "Surface the slow decline that's invisible visit-by-visit.",
+        "persona": "amara",
+        "persona_role": "Panel GP",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "trajectory",
+            "priority": 1,
+            "summary": "eGFR 55 -> 34 over 3y (~7.1 mL/min/1.73m2/yr) across steady-state values \u2014 sustained rapid progression, now G3b A3. Invisible value-by-value without trend-fitting."
+          },
+          {
+            "type": "referral",
+            "priority": 3,
+            "summary": "Draft nephrology referral \u2014 trigger: KFRE 5-yr 6.0% >= 5%; sustained rapid progression. (KFRE 5-yr 6.0%.)"
+          }
+        ],
+        "suppress": [
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 6.0
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Obesity",
+        "Osteoarthritis",
+        "Hyperlipidaemia"
+      ],
+      "encounters": [
+        {
+          "date": "2026-03-05",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-03-10",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "statin-01",
+      "name": "Thomas B.",
+      "age": 59,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "CKD G3a"
+      ],
+      "labs": [
+        {
+          "date": "2024-06-18",
+          "egfr": 55,
+          "acr_mg_g": 15,
+          "potassium_mmol_l": 4.2,
+          "creatinine_mg_dl": 1.4
+        },
+        {
+          "date": "2025-06-15",
+          "egfr": 54,
+          "acr_mg_g": 18,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.42
+        },
+        {
+          "date": "2026-01-30",
+          "egfr": 53,
+          "acr_mg_g": 16,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.44
+        }
+      ],
+      "medications": [
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        }
+      ],
+      "source": "anchor",
+      "tags": {
+        "category": "C4_gap_fire",
+        "category_label": "Correct gap fire",
+        "jtbd": "close_gap",
+        "jtbd_desc": "Name the now-indicated drug they're not on.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "easy"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A1",
+        "risk_tier": "yellow",
+        "surface": [
+          {
+            "type": "gap",
+            "drug": "statin",
+            "priority": 3,
+            "summary": "Adult >= 50 (age 59) with CKD \u2014 statin indicated for CV-risk reduction, not prescribed."
+          }
+        ],
+        "suppress": [],
+        "kfre_5yr_pct": 0.2
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Hypothyroidism",
+        "Hyperlipidaemia"
+      ],
+      "encounters": [
+        {
+          "date": "2026-01-30",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-06-15",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "finerenone-01",
+      "name": "Priya S.",
+      "age": 61,
+      "sex": "F",
+      "diabetes": true,
+      "problems": [
+        "type 2 diabetes",
+        "hypertension",
+        "CKD G3a",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-04-09",
+          "egfr": 50,
+          "acr_mg_g": 320,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.2
+        },
+        {
+          "date": "2025-04-14",
+          "egfr": 49,
+          "acr_mg_g": 300,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.22
+        },
+        {
+          "date": "2026-02-24",
+          "egfr": 48,
+          "acr_mg_g": 310,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.24
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "40 mg",
+          "class": "statin"
+        },
+        {
+          "name": "metformin",
+          "dose": "1 g",
+          "class": "biguanide"
+        }
+      ],
+      "source": "anchor",
+      "tags": {
+        "category": "C4_gap_fire",
+        "category_label": "Correct gap fire",
+        "jtbd": "close_gap",
+        "jtbd_desc": "Name the now-indicated drug they're not on.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "gap",
+            "drug": "finerenone",
+            "priority": 2,
+            "summary": "T2D + albuminuric CKD (ACR 310), on RASi, K+ 4.6 normal, eGFR 48 >= 25 \u2014 finerenone (nsMRA) indicated, not prescribed."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.1 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 48 >= 30, ACR < 620, KFRE 1.1% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 1.1
+      },
+      "comorbidities": [
+        "Type 2 diabetes mellitus",
+        "Hypertension",
+        "Chronic kidney disease",
+        "Atrial fibrillation",
+        "Peripheral vascular disease",
+        "Gout"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-24",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-04-14",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "muscle-01",
+      "name": "Eleanor W.",
+      "age": 82,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "frailty / low muscle mass",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-04-03",
+          "egfr": 66,
+          "acr_mg_g": 90,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 0.75,
+          "flags": [
+            "low_muscle_mass"
+          ]
+        },
+        {
+          "date": "2025-04-08",
+          "egfr": 64,
+          "acr_mg_g": 110,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 0.78,
+          "flags": [
+            "low_muscle_mass"
+          ]
+        },
+        {
+          "date": "2026-02-17",
+          "egfr": 63,
+          "acr_mg_g": 120,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 0.8,
+          "flags": [
+            "low_muscle_mass"
+          ]
+        }
+      ],
+      "medications": [
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "anchor",
+      "tags": {
+        "category": "C3_false_decline",
+        "category_label": "Suppress false decline (AKI / pseudo-rise / muscle)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G2 A2",
+        "risk_tier": "yellow",
+        "surface": [
+          {
+            "type": "gap",
+            "drug": "RAS inhibitor",
+            "priority": 2,
+            "summary": "Albuminuric CKD (ACR 120) \u2014 RAS inhibitor indicated for cardiorenal protection, not prescribed."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "egfr_failure_mode",
+            "item": "eGFR 63",
+            "reason": "Low muscle mass / cachexia \u2014 creatinine-based eGFR overestimates true GFR. Confirm with cystatin C; do not act on the number."
+          },
+          {
+            "type": "not_indicated",
+            "item": "SGLT2 inhibitor",
+            "reason": "ACR 120 (< 200), no HF, non-diabetic \u2014 SGLT2 inhibitor not indicated."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 0.1
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Osteoarthritis",
+        "Hypothyroidism"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-17",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-04-08",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c1-g01",
+      "name": "Kofi T.",
+      "age": 35,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 95,
+          "acr_mg_g": 12,
+          "potassium_mmol_l": 4.1,
+          "creatinine_mg_dl": 0.71
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 94,
+          "acr_mg_g": 12,
+          "potassium_mmol_l": 4.2,
+          "creatinine_mg_dl": 0.71
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 94,
+          "acr_mg_g": 11,
+          "potassium_mmol_l": 4.2,
+          "creatinine_mg_dl": 0.71
+        }
+      ],
+      "medications": [],
+      "source": "generated",
+      "tags": {
+        "category": "C1_staging",
+        "category_label": "Staging & definition gate",
+        "jtbd": "stratify",
+        "jtbd_desc": "Place each patient on the KDIGO risk grid.",
+        "persona": "amara",
+        "persona_role": "Panel GP",
+        "difficulty": "easy"
+      },
+      "expected": {
+        "ckd": false,
+        "stage": null,
+        "risk_tier": null,
+        "surface": [],
+        "suppress": [
+          {
+            "type": "not_ckd",
+            "item": "patient",
+            "reason": "G1 A1 with no damage marker \u2014 does not meet the CKD definition gate; normal kidney, do not surface."
+          }
+        ]
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Osteoarthritis"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c1-g02",
+      "name": "Frank G.",
+      "age": 53,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 85,
+          "acr_mg_g": 5,
+          "potassium_mmol_l": 4.1,
+          "creatinine_mg_dl": 0.79
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 84,
+          "acr_mg_g": 4,
+          "potassium_mmol_l": 4.1,
+          "creatinine_mg_dl": 0.8
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 84,
+          "acr_mg_g": 4,
+          "potassium_mmol_l": 4.2,
+          "creatinine_mg_dl": 0.8
+        }
+      ],
+      "medications": [],
+      "source": "generated",
+      "tags": {
+        "category": "C1_staging",
+        "category_label": "Staging & definition gate",
+        "jtbd": "stratify",
+        "jtbd_desc": "Place each patient on the KDIGO risk grid.",
+        "persona": "amara",
+        "persona_role": "Panel GP",
+        "difficulty": "easy"
+      },
+      "expected": {
+        "ckd": false,
+        "stage": null,
+        "risk_tier": null,
+        "surface": [],
+        "suppress": [
+          {
+            "type": "not_ckd",
+            "item": "patient",
+            "reason": "G2 A1 with no damage marker \u2014 does not meet the CKD definition gate; normal kidney, do not surface."
+          }
+        ]
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Benign prostatic hyperplasia",
+        "Gout"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c1-g03",
+      "name": "Sofia F.",
+      "age": 62,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 52,
+          "acr_mg_g": 15,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.15
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 51,
+          "acr_mg_g": 16,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.18
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 50,
+          "acr_mg_g": 18,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.2
+        }
+      ],
+      "medications": [
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C1_staging",
+        "category_label": "Staging & definition gate",
+        "jtbd": "stratify",
+        "jtbd_desc": "Place each patient on the KDIGO risk grid.",
+        "persona": "amara",
+        "persona_role": "Panel GP",
+        "difficulty": "easy"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A1",
+        "risk_tier": "yellow",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 0.2
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Hyperlipidaemia",
+        "Osteoarthritis",
+        "Ischaemic heart disease"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c1-g04",
+      "name": "Aisha C.",
+      "age": 65,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 40,
+          "acr_mg_g": 20,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.5
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 39,
+          "acr_mg_g": 22,
+          "potassium_mmol_l": 4.2,
+          "creatinine_mg_dl": 1.54
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 38,
+          "acr_mg_g": 23,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.58
+        }
+      ],
+      "medications": [
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C1_staging",
+        "category_label": "Staging & definition gate",
+        "jtbd": "stratify",
+        "jtbd_desc": "Place each patient on the KDIGO risk grid.",
+        "persona": "amara",
+        "persona_role": "Panel GP",
+        "difficulty": "easy"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A1",
+        "risk_tier": "orange",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 38 >= 30, ACR < 620, KFRE 0.9% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 0.9
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Gout",
+        "Atrial fibrillation"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c1-g05",
+      "name": "Margaret P.",
+      "age": 58,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 25,
+          "acr_mg_g": 25,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 2.4
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 24,
+          "acr_mg_g": 26,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 2.5
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 23,
+          "acr_mg_g": 28,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 2.61
+        }
+      ],
+      "medications": [
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C1_staging",
+        "category_label": "Staging & definition gate",
+        "jtbd": "stratify",
+        "jtbd_desc": "Place each patient on the KDIGO risk grid.",
+        "persona": "amara",
+        "persona_role": "Panel GP",
+        "difficulty": "easy"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G4 A1",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "referral",
+            "priority": 3,
+            "summary": "Draft nephrology referral \u2014 trigger: eGFR 23 < 30; KFRE 5-yr 6.2% >= 5%. (KFRE 5-yr 6.2%.)"
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 6.2
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Hypothyroidism"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c2-g01",
+      "name": "David B.",
+      "age": 62,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2023-02-02",
+          "egfr": 57,
+          "acr_mg_g": 210,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.18
+        },
+        {
+          "date": "2024-02-02",
+          "egfr": 50,
+          "acr_mg_g": 258,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.34
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 43,
+          "acr_mg_g": 305,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.56
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 36,
+          "acr_mg_g": 353,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.87
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C2_true_decline",
+        "category_label": "True rapid progression",
+        "jtbd": "catch",
+        "jtbd_desc": "Surface the slow decline that's invisible visit-by-visit.",
+        "persona": "amara",
+        "persona_role": "Panel GP",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "trajectory",
+            "priority": 1,
+            "summary": "eGFR 57 -> 36 over 3y (~7.0 mL/min/1.73m2/yr) across steady-state values \u2014 sustained rapid progression, now G3b A3. Invisible value-by-value without trend-fitting."
+          },
+          {
+            "type": "gap",
+            "drug": "SGLT2 inhibitor",
+            "priority": 2,
+            "summary": "Albuminuric CKD (ACR 353 >= 200), eGFR 36 >= 20, non-diabetic \u2014 SGLT2 inhibitor indicated, not prescribed."
+          },
+          {
+            "type": "referral",
+            "priority": 3,
+            "summary": "Draft nephrology referral \u2014 trigger: KFRE 5-yr 5.4% >= 5%; sustained rapid progression. (KFRE 5-yr 5.4%.)"
+          }
+        ],
+        "suppress": [
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 5.4
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Atrial fibrillation",
+        "Obesity"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c2-g02",
+      "name": "Daniel M.",
+      "age": 59,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2023-02-02",
+          "egfr": 57,
+          "acr_mg_g": 210,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.18
+        },
+        {
+          "date": "2024-02-02",
+          "egfr": 49,
+          "acr_mg_g": 258,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.37
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 42,
+          "acr_mg_g": 307,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.6
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 34,
+          "acr_mg_g": 355,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.98
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C2_true_decline",
+        "category_label": "True rapid progression",
+        "jtbd": "catch",
+        "jtbd_desc": "Surface the slow decline that's invisible visit-by-visit.",
+        "persona": "amara",
+        "persona_role": "Panel GP",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "trajectory",
+            "priority": 1,
+            "summary": "eGFR 57 -> 34 over 3y (~7.6 mL/min/1.73m2/yr) across steady-state values \u2014 sustained rapid progression, now G3b A3. Invisible value-by-value without trend-fitting."
+          },
+          {
+            "type": "referral",
+            "priority": 3,
+            "summary": "Draft nephrology referral \u2014 trigger: KFRE 5-yr 7.2% >= 5%; sustained rapid progression. (KFRE 5-yr 7.2%.)"
+          }
+        ],
+        "suppress": [
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 7.2
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Obesity",
+        "Ischaemic heart disease",
+        "Benign prostatic hyperplasia"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c2-g03",
+      "name": "Robert P.",
+      "age": 71,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2023-02-02",
+          "egfr": 60,
+          "acr_mg_g": 210,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.12
+        },
+        {
+          "date": "2024-02-02",
+          "egfr": 53,
+          "acr_mg_g": 254,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.27
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 45,
+          "acr_mg_g": 299,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.49
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 38,
+          "acr_mg_g": 343,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.77
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C2_true_decline",
+        "category_label": "True rapid progression",
+        "jtbd": "catch",
+        "jtbd_desc": "Surface the slow decline that's invisible visit-by-visit.",
+        "persona": "amara",
+        "persona_role": "Panel GP",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "trajectory",
+            "priority": 1,
+            "summary": "eGFR 60 -> 38 over 3y (~7.4 mL/min/1.73m2/yr) across steady-state values \u2014 sustained rapid progression, now G3b A3. Invisible value-by-value without trend-fitting."
+          },
+          {
+            "type": "gap",
+            "drug": "SGLT2 inhibitor",
+            "priority": 2,
+            "summary": "Albuminuric CKD (ACR 343 >= 200), eGFR 38 >= 20, non-diabetic \u2014 SGLT2 inhibitor indicated, not prescribed."
+          },
+          {
+            "type": "referral",
+            "priority": 3,
+            "summary": "Draft nephrology referral \u2014 trigger: sustained rapid progression. (KFRE 5-yr 3.5%.)"
+          }
+        ],
+        "suppress": [
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 3.5
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "GORD"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c2-g04",
+      "name": "Margaret L.",
+      "age": 58,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2023-02-02",
+          "egfr": 66,
+          "acr_mg_g": 210,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 0.91
+        },
+        {
+          "date": "2024-02-02",
+          "egfr": 59,
+          "acr_mg_g": 245,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.02
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 51,
+          "acr_mg_g": 279,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.18
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 44,
+          "acr_mg_g": 314,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.36
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C2_true_decline",
+        "category_label": "True rapid progression",
+        "jtbd": "catch",
+        "jtbd_desc": "Surface the slow decline that's invisible visit-by-visit.",
+        "persona": "amara",
+        "persona_role": "Panel GP",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "trajectory",
+            "priority": 1,
+            "summary": "eGFR 66 -> 44 over 3y (~7.4 mL/min/1.73m2/yr) across steady-state values \u2014 sustained rapid progression, now G3b A3. Invisible value-by-value without trend-fitting."
+          },
+          {
+            "type": "referral",
+            "priority": 3,
+            "summary": "Draft nephrology referral \u2014 trigger: sustained rapid progression. (KFRE 5-yr 1.8%.)"
+          }
+        ],
+        "suppress": [
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 1.8
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Peripheral vascular disease"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c2-g05",
+      "name": "Fatima P.",
+      "age": 58,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2023-02-02",
+          "egfr": 57,
+          "acr_mg_g": 210,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.05
+        },
+        {
+          "date": "2024-02-02",
+          "egfr": 51,
+          "acr_mg_g": 260,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.18
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 44,
+          "acr_mg_g": 310,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.36
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 38,
+          "acr_mg_g": 360,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.58
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C2_true_decline",
+        "category_label": "True rapid progression",
+        "jtbd": "catch",
+        "jtbd_desc": "Surface the slow decline that's invisible visit-by-visit.",
+        "persona": "amara",
+        "persona_role": "Panel GP",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "trajectory",
+            "priority": 1,
+            "summary": "eGFR 57 -> 38 over 3y (~6.4 mL/min/1.73m2/yr) across steady-state values \u2014 sustained rapid progression, now G3b A3. Invisible value-by-value without trend-fitting."
+          },
+          {
+            "type": "gap",
+            "drug": "SGLT2 inhibitor",
+            "priority": 2,
+            "summary": "Albuminuric CKD (ACR 360 >= 200), eGFR 38 >= 20, non-diabetic \u2014 SGLT2 inhibitor indicated, not prescribed."
+          },
+          {
+            "type": "referral",
+            "priority": 3,
+            "summary": "Draft nephrology referral \u2014 trigger: sustained rapid progression. (KFRE 5-yr 3.8%.)"
+          }
+        ],
+        "suppress": [
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 3.8
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Hyperlipidaemia"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c3-g01",
+      "name": "Daniel H.",
+      "age": 58,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "CKD"
+      ],
+      "labs": [
+        {
+          "date": "2023-08-03",
+          "egfr": 55,
+          "acr_mg_g": 22,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.22
+        },
+        {
+          "date": "2024-03-19",
+          "egfr": 55,
+          "acr_mg_g": 23,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.22
+        },
+        {
+          "date": "2024-11-02",
+          "egfr": 29,
+          "acr_mg_g": 24,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 2.32,
+          "flags": [
+            "acute_illness"
+          ]
+        },
+        {
+          "date": "2025-06-18",
+          "egfr": 54,
+          "acr_mg_g": 25,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.24
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 54,
+          "acr_mg_g": 26,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.24
+        }
+      ],
+      "medications": [
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C3_false_decline",
+        "category_label": "Suppress false decline (AKI / pseudo-rise / muscle)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A1",
+        "risk_tier": "yellow",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "non_steady_state",
+            "item": "eGFR dip on 2024-11-02",
+            "reason": "Coincided with acute illness / volume depletion \u2014 non-steady-state, not progression."
+          },
+          {
+            "type": "resolved_aki",
+            "item": "trajectory",
+            "reason": "In-hospital nadir recovered to baseline \u2014 true trajectory is stable; do not flag progression."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 0.3
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Gout",
+        "Atrial fibrillation",
+        "Obesity"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-06-18",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        },
+        {
+          "date": "2024-11-02",
+          "type": "Hospital admission",
+          "summary": "Community-acquired pneumonia; volume depleted. AKI on background CKD."
+        }
+      ]
+    },
+    {
+      "id": "c3-g02",
+      "name": "Oscar C.",
+      "age": 66,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "CKD"
+      ],
+      "labs": [
+        {
+          "date": "2023-08-03",
+          "egfr": 57,
+          "acr_mg_g": 22,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.18
+        },
+        {
+          "date": "2024-03-19",
+          "egfr": 57,
+          "acr_mg_g": 23,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.18
+        },
+        {
+          "date": "2024-11-02",
+          "egfr": 28,
+          "acr_mg_g": 24,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 2.4,
+          "flags": [
+            "acute_illness"
+          ]
+        },
+        {
+          "date": "2025-06-18",
+          "egfr": 56,
+          "acr_mg_g": 25,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.2
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 56,
+          "acr_mg_g": 26,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.2
+        }
+      ],
+      "medications": [
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C3_false_decline",
+        "category_label": "Suppress false decline (AKI / pseudo-rise / muscle)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A1",
+        "risk_tier": "yellow",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "non_steady_state",
+            "item": "eGFR dip on 2024-11-02",
+            "reason": "Coincided with acute illness / volume depletion \u2014 non-steady-state, not progression."
+          },
+          {
+            "type": "resolved_aki",
+            "item": "trajectory",
+            "reason": "In-hospital nadir recovered to baseline \u2014 true trajectory is stable; do not flag progression."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 0.2
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Peripheral vascular disease",
+        "Atrial fibrillation",
+        "Ischaemic heart disease"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-06-18",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        },
+        {
+          "date": "2024-11-02",
+          "type": "Hospital admission",
+          "summary": "Community-acquired pneumonia; volume depleted. AKI on background CKD."
+        }
+      ]
+    },
+    {
+      "id": "c3-g03",
+      "name": "Amina T.",
+      "age": 62,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "CKD"
+      ],
+      "labs": [
+        {
+          "date": "2023-08-03",
+          "egfr": 58,
+          "acr_mg_g": 22,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.03
+        },
+        {
+          "date": "2024-03-19",
+          "egfr": 58,
+          "acr_mg_g": 23,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.03
+        },
+        {
+          "date": "2024-11-02",
+          "egfr": 31,
+          "acr_mg_g": 24,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.94,
+          "flags": [
+            "acute_illness"
+          ]
+        },
+        {
+          "date": "2025-06-18",
+          "egfr": 57,
+          "acr_mg_g": 25,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.05
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 57,
+          "acr_mg_g": 26,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.05
+        }
+      ],
+      "medications": [
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C3_false_decline",
+        "category_label": "Suppress false decline (AKI / pseudo-rise / muscle)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A1",
+        "risk_tier": "yellow",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "non_steady_state",
+            "item": "eGFR dip on 2024-11-02",
+            "reason": "Coincided with acute illness / volume depletion \u2014 non-steady-state, not progression."
+          },
+          {
+            "type": "resolved_aki",
+            "item": "trajectory",
+            "reason": "In-hospital nadir recovered to baseline \u2014 true trajectory is stable; do not flag progression."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 0.1
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Former smoker",
+        "Osteoarthritis",
+        "Hyperlipidaemia"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-06-18",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        },
+        {
+          "date": "2024-11-02",
+          "type": "Hospital admission",
+          "summary": "Community-acquired pneumonia; volume depleted. AKI on background CKD."
+        }
+      ]
+    },
+    {
+      "id": "c3-g04",
+      "name": "Emily S.",
+      "age": 68,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "CKD",
+        "recurrent UTI"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 48,
+          "acr_mg_g": 40,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.25
+        },
+        {
+          "date": "2024-10-02",
+          "egfr": 48,
+          "acr_mg_g": 42,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.25
+        },
+        {
+          "date": "2025-06-03",
+          "egfr": 40,
+          "acr_mg_g": 43,
+          "potassium_mmol_l": 4.7,
+          "creatinine_mg_dl": 1.5,
+          "flags": [
+            "trimethoprim_course"
+          ]
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 47,
+          "acr_mg_g": 45,
+          "potassium_mmol_l": 4.7,
+          "creatinine_mg_dl": 1.28
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "5 mg",
+          "class": "ACEi",
+          "at_max": false
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C3_false_decline",
+        "category_label": "Suppress false decline (AKI / pseudo-rise / muscle)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A2",
+        "risk_tier": "orange",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "pseudo_rise",
+            "item": "creatinine rise on trimethoprim",
+            "reason": "Trimethoprim blocks tubular creatinine secretion \u2014 pseudo-rise, not true GFR decline. Confirm with cystatin C if it persists."
+          },
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~0.5 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "SGLT2 inhibitor",
+            "reason": "ACR 45 (< 200), no HF, non-diabetic \u2014 SGLT2 inhibitor not indicated."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 47 >= 30, ACR < 620, KFRE 0.4% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 0.4
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Osteoarthritis",
+        "Hypothyroidism"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-06-03",
+          "type": "GP consultation",
+          "summary": "Urinary tract infection \u2014 trimethoprim 200 mg BD for 7 days."
+        },
+        {
+          "date": "2025-06-03",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c3-g05",
+      "name": "Robert T.",
+      "age": 74,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "CKD",
+        "recurrent UTI"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 48,
+          "acr_mg_g": 40,
+          "potassium_mmol_l": 4.7,
+          "creatinine_mg_dl": 1.4
+        },
+        {
+          "date": "2024-10-02",
+          "egfr": 48,
+          "acr_mg_g": 42,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.4
+        },
+        {
+          "date": "2025-06-03",
+          "egfr": 40,
+          "acr_mg_g": 43,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.68,
+          "flags": [
+            "trimethoprim_course"
+          ]
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 47,
+          "acr_mg_g": 45,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.43
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "5 mg",
+          "class": "ACEi",
+          "at_max": false
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C3_false_decline",
+        "category_label": "Suppress false decline (AKI / pseudo-rise / muscle)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A2",
+        "risk_tier": "orange",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "pseudo_rise",
+            "item": "creatinine rise on trimethoprim",
+            "reason": "Trimethoprim blocks tubular creatinine secretion \u2014 pseudo-rise, not true GFR decline. Confirm with cystatin C if it persists."
+          },
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~0.5 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "SGLT2 inhibitor",
+            "reason": "ACR 45 (< 200), no HF, non-diabetic \u2014 SGLT2 inhibitor not indicated."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 47 >= 30, ACR < 620, KFRE 0.5% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 0.5
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Hypothyroidism"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-06-03",
+          "type": "GP consultation",
+          "summary": "Urinary tract infection \u2014 trimethoprim 200 mg BD for 7 days."
+        },
+        {
+          "date": "2025-06-03",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c3-g06",
+      "name": "Thomas B.",
+      "age": 68,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "CKD",
+        "recurrent UTI"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 51,
+          "acr_mg_g": 40,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.32
+        },
+        {
+          "date": "2024-10-02",
+          "egfr": 51,
+          "acr_mg_g": 42,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.32
+        },
+        {
+          "date": "2025-06-03",
+          "egfr": 38,
+          "acr_mg_g": 43,
+          "potassium_mmol_l": 4.7,
+          "creatinine_mg_dl": 1.77,
+          "flags": [
+            "trimethoprim_course"
+          ]
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 50,
+          "acr_mg_g": 45,
+          "potassium_mmol_l": 4.7,
+          "creatinine_mg_dl": 1.34
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "5 mg",
+          "class": "ACEi",
+          "at_max": false
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C3_false_decline",
+        "category_label": "Suppress false decline (AKI / pseudo-rise / muscle)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A2",
+        "risk_tier": "orange",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "pseudo_rise",
+            "item": "creatinine rise on trimethoprim",
+            "reason": "Trimethoprim blocks tubular creatinine secretion \u2014 pseudo-rise, not true GFR decline. Confirm with cystatin C if it persists."
+          },
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~0.5 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "SGLT2 inhibitor",
+            "reason": "ACR 45 (< 200), no HF, non-diabetic \u2014 SGLT2 inhibitor not indicated."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 50 >= 30, ACR < 620, KFRE 0.4% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 0.4
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Hypothyroidism",
+        "Peripheral vascular disease"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-06-03",
+          "type": "GP consultation",
+          "summary": "Urinary tract infection \u2014 trimethoprim 200 mg BD for 7 days."
+        },
+        {
+          "date": "2025-06-03",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c3-g07",
+      "name": "Raj T.",
+      "age": 85,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "frailty / low muscle mass",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 62,
+          "acr_mg_g": 90,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.08,
+          "flags": [
+            "low_muscle_mass"
+          ]
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 62,
+          "acr_mg_g": 105,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.08,
+          "flags": [
+            "low_muscle_mass"
+          ]
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 61,
+          "acr_mg_g": 120,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.1,
+          "flags": [
+            "low_muscle_mass"
+          ]
+        }
+      ],
+      "medications": [
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C3_false_decline",
+        "category_label": "Suppress false decline (AKI / pseudo-rise / muscle)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G2 A2",
+        "risk_tier": "yellow",
+        "surface": [
+          {
+            "type": "gap",
+            "drug": "RAS inhibitor",
+            "priority": 2,
+            "summary": "Albuminuric CKD (ACR 120) \u2014 RAS inhibitor indicated for cardiorenal protection, not prescribed."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "egfr_failure_mode",
+            "item": "eGFR 61",
+            "reason": "Low muscle mass / cachexia \u2014 creatinine-based eGFR overestimates true GFR. Confirm with cystatin C; do not act on the number."
+          },
+          {
+            "type": "not_indicated",
+            "item": "SGLT2 inhibitor",
+            "reason": "ACR 120 (< 200), no HF, non-diabetic \u2014 SGLT2 inhibitor not indicated."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 0.1
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Benign prostatic hyperplasia"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c3-g08",
+      "name": "Wei Z.",
+      "age": 78,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "frailty / low muscle mass",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 67,
+          "acr_mg_g": 90,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.0,
+          "flags": [
+            "low_muscle_mass"
+          ]
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 67,
+          "acr_mg_g": 105,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.0,
+          "flags": [
+            "low_muscle_mass"
+          ]
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 66,
+          "acr_mg_g": 120,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.02,
+          "flags": [
+            "low_muscle_mass"
+          ]
+        }
+      ],
+      "medications": [
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C3_false_decline",
+        "category_label": "Suppress false decline (AKI / pseudo-rise / muscle)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G2 A2",
+        "risk_tier": "yellow",
+        "surface": [
+          {
+            "type": "gap",
+            "drug": "RAS inhibitor",
+            "priority": 2,
+            "summary": "Albuminuric CKD (ACR 120) \u2014 RAS inhibitor indicated for cardiorenal protection, not prescribed."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "egfr_failure_mode",
+            "item": "eGFR 66",
+            "reason": "Low muscle mass / cachexia \u2014 creatinine-based eGFR overestimates true GFR. Confirm with cystatin C; do not act on the number."
+          },
+          {
+            "type": "not_indicated",
+            "item": "SGLT2 inhibitor",
+            "reason": "ACR 120 (< 200), no HF, non-diabetic \u2014 SGLT2 inhibitor not indicated."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 0.1
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Ischaemic heart disease"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c4-g01",
+      "name": "Eleanor P.",
+      "age": 54,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 54,
+          "acr_mg_g": 240,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.11
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 52,
+          "acr_mg_g": 262,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.15
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 51,
+          "acr_mg_g": 285,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.18
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C4_gap_fire",
+        "category_label": "Correct gap fire",
+        "jtbd": "close_gap",
+        "jtbd_desc": "Name the now-indicated drug they're not on.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A2",
+        "risk_tier": "orange",
+        "surface": [
+          {
+            "type": "gap",
+            "drug": "SGLT2 inhibitor",
+            "priority": 2,
+            "summary": "Albuminuric CKD (ACR 285 >= 200), eGFR 51 >= 20, non-diabetic \u2014 SGLT2 inhibitor indicated, not prescribed."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.5 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 51 >= 30, ACR < 620, KFRE 0.9% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 0.9
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Atrial fibrillation"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c4-g02",
+      "name": "Clara H.",
+      "age": 51,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 49,
+          "acr_mg_g": 240,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.22
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 48,
+          "acr_mg_g": 264,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.25
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 46,
+          "acr_mg_g": 288,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.3
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C4_gap_fire",
+        "category_label": "Correct gap fire",
+        "jtbd": "close_gap",
+        "jtbd_desc": "Name the now-indicated drug they're not on.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A2",
+        "risk_tier": "orange",
+        "surface": [
+          {
+            "type": "gap",
+            "drug": "SGLT2 inhibitor",
+            "priority": 2,
+            "summary": "Albuminuric CKD (ACR 288 >= 200), eGFR 46 >= 20, non-diabetic \u2014 SGLT2 inhibitor indicated, not prescribed."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.5 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 46 >= 30, ACR < 620, KFRE 1.6% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 1.6
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Peripheral vascular disease"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c4-g03",
+      "name": "Wei L.",
+      "age": 57,
+      "sex": "M",
+      "diabetes": true,
+      "problems": [
+        "type 2 diabetes",
+        "hypertension",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 51,
+          "acr_mg_g": 300,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.32
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 50,
+          "acr_mg_g": 315,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.34
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 49,
+          "acr_mg_g": 330,
+          "potassium_mmol_l": 4.7,
+          "creatinine_mg_dl": 1.37
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "metformin",
+          "dose": "1 g",
+          "class": "biguanide"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C4_gap_fire",
+        "category_label": "Correct gap fire",
+        "jtbd": "close_gap",
+        "jtbd_desc": "Name the now-indicated drug they're not on.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "gap",
+            "drug": "finerenone",
+            "priority": 2,
+            "summary": "T2D + albuminuric CKD (ACR 330), on RASi, K+ 4.7 normal, eGFR 49 >= 25 \u2014 finerenone (nsMRA) indicated, not prescribed."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 49 >= 30, ACR < 620, KFRE 1.4% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 1.4
+      },
+      "comorbidities": [
+        "Type 2 diabetes mellitus",
+        "Hypertension",
+        "Chronic kidney disease",
+        "Peripheral vascular disease",
+        "Osteoarthritis"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c4-g04",
+      "name": "Kofi W.",
+      "age": 62,
+      "sex": "M",
+      "diabetes": true,
+      "problems": [
+        "type 2 diabetes",
+        "hypertension",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 44,
+          "acr_mg_g": 300,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.53
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 43,
+          "acr_mg_g": 315,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.56
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 42,
+          "acr_mg_g": 330,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.6
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "metformin",
+          "dose": "1 g",
+          "class": "biguanide"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C4_gap_fire",
+        "category_label": "Correct gap fire",
+        "jtbd": "close_gap",
+        "jtbd_desc": "Name the now-indicated drug they're not on.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "gap",
+            "drug": "finerenone",
+            "priority": 2,
+            "summary": "T2D + albuminuric CKD (ACR 330), on RASi, K+ 4.5 normal, eGFR 42 >= 25 \u2014 finerenone (nsMRA) indicated, not prescribed."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 42 >= 30, ACR < 620, KFRE 2.7% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 2.7
+      },
+      "comorbidities": [
+        "Type 2 diabetes mellitus",
+        "Hypertension",
+        "Chronic kidney disease",
+        "GORD",
+        "Peripheral vascular disease",
+        "Osteoarthritis"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c4-g05",
+      "name": "Ruth M.",
+      "age": 59,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "CKD"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 55,
+          "acr_mg_g": 14,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.09
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 54,
+          "acr_mg_g": 16,
+          "potassium_mmol_l": 4.2,
+          "creatinine_mg_dl": 1.11
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 54,
+          "acr_mg_g": 18,
+          "potassium_mmol_l": 4.2,
+          "creatinine_mg_dl": 1.11
+        }
+      ],
+      "medications": [
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C4_gap_fire",
+        "category_label": "Correct gap fire",
+        "jtbd": "close_gap",
+        "jtbd_desc": "Name the now-indicated drug they're not on.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "easy"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A1",
+        "risk_tier": "yellow",
+        "surface": [
+          {
+            "type": "gap",
+            "drug": "statin",
+            "priority": 3,
+            "summary": "Adult >= 50 (age 59) with CKD \u2014 statin indicated for CV-risk reduction, not prescribed."
+          }
+        ],
+        "suppress": [],
+        "kfre_5yr_pct": 0.2
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "GORD"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c4-g06",
+      "name": "Amina D.",
+      "age": 65,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "CKD"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 55,
+          "acr_mg_g": 14,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.09
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 54,
+          "acr_mg_g": 16,
+          "potassium_mmol_l": 4.2,
+          "creatinine_mg_dl": 1.11
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 54,
+          "acr_mg_g": 18,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.11
+        }
+      ],
+      "medications": [
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C4_gap_fire",
+        "category_label": "Correct gap fire",
+        "jtbd": "close_gap",
+        "jtbd_desc": "Name the now-indicated drug they're not on.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "easy"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A1",
+        "risk_tier": "yellow",
+        "surface": [
+          {
+            "type": "gap",
+            "drug": "statin",
+            "priority": 3,
+            "summary": "Adult >= 50 (age 65) with CKD \u2014 statin indicated for CV-risk reduction, not prescribed."
+          }
+        ],
+        "suppress": [],
+        "kfre_5yr_pct": 0.1
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Former smoker",
+        "GORD"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c4-g07",
+      "name": "Thomas T.",
+      "age": 57,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 69,
+          "acr_mg_g": 60,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 0.97
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 68,
+          "acr_mg_g": 75,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 0.99
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 68,
+          "acr_mg_g": 90,
+          "potassium_mmol_l": 4.2,
+          "creatinine_mg_dl": 0.99
+        }
+      ],
+      "medications": [
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C4_gap_fire",
+        "category_label": "Correct gap fire",
+        "jtbd": "close_gap",
+        "jtbd_desc": "Name the now-indicated drug they're not on.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G2 A2",
+        "risk_tier": "yellow",
+        "surface": [
+          {
+            "type": "gap",
+            "drug": "RAS inhibitor",
+            "priority": 2,
+            "summary": "Albuminuric CKD (ACR 90) \u2014 RAS inhibitor indicated for cardiorenal protection, not prescribed."
+          },
+          {
+            "type": "gap",
+            "drug": "statin",
+            "priority": 3,
+            "summary": "Adult >= 50 (age 57) with CKD \u2014 statin indicated for CV-risk reduction, not prescribed."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "not_indicated",
+            "item": "SGLT2 inhibitor",
+            "reason": "ACR 90 (< 200), no HF, non-diabetic \u2014 SGLT2 inhibitor not indicated."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          }
+        ],
+        "kfre_5yr_pct": 0.1
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Atrial fibrillation",
+        "Gout",
+        "Obesity"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c4-g08",
+      "name": "Aisha P.",
+      "age": 49,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 64,
+          "acr_mg_g": 60,
+          "potassium_mmol_l": 4.2,
+          "creatinine_mg_dl": 0.94
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 63,
+          "acr_mg_g": 75,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 0.95
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 63,
+          "acr_mg_g": 90,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 0.95
+        }
+      ],
+      "medications": [
+        {
+          "name": "amlodipine",
+          "dose": "5 mg",
+          "class": "CCB"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C4_gap_fire",
+        "category_label": "Correct gap fire",
+        "jtbd": "close_gap",
+        "jtbd_desc": "Name the now-indicated drug they're not on.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G2 A2",
+        "risk_tier": "yellow",
+        "surface": [
+          {
+            "type": "gap",
+            "drug": "RAS inhibitor",
+            "priority": 2,
+            "summary": "Albuminuric CKD (ACR 90) \u2014 RAS inhibitor indicated for cardiorenal protection, not prescribed."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "not_indicated",
+            "item": "SGLT2 inhibitor",
+            "reason": "ACR 90 (< 200), no HF, non-diabetic \u2014 SGLT2 inhibitor not indicated."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          }
+        ],
+        "kfre_5yr_pct": 0.2
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Hypothyroidism",
+        "Former smoker",
+        "Osteoarthritis"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c5-g01",
+      "name": "George R.",
+      "age": 58,
+      "sex": "M",
+      "diabetes": true,
+      "problems": [
+        "type 2 diabetes",
+        "hypertension",
+        "CKD",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 39,
+          "acr_mg_g": 320,
+          "potassium_mmol_l": 4.7,
+          "creatinine_mg_dl": 1.72
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 38,
+          "acr_mg_g": 330,
+          "potassium_mmol_l": 4.7,
+          "creatinine_mg_dl": 1.77
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 37,
+          "acr_mg_g": 340,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.82
+        }
+      ],
+      "medications": [
+        {
+          "name": "losartan",
+          "dose": "100 mg",
+          "class": "ARB",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "finerenone",
+          "dose": "20 mg",
+          "class": "nsMRA"
+        },
+        {
+          "name": "metformin",
+          "dose": "1 g",
+          "class": "biguanide"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C5_gap_nonfire",
+        "category_label": "Correct gap non-fire (optimised / below threshold)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "referral",
+            "priority": 3,
+            "summary": "Draft nephrology referral \u2014 trigger: KFRE 5-yr 5.2% >= 5%. (KFRE 5-yr 5.2%.)"
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "finerenone",
+            "reason": "Already on finerenone."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 5.2
+      },
+      "comorbidities": [
+        "Type 2 diabetes mellitus",
+        "Hypertension",
+        "Chronic kidney disease",
+        "Peripheral vascular disease",
+        "GORD"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c5-g02",
+      "name": "Raj P.",
+      "age": 59,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "CKD",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 40,
+          "acr_mg_g": 320,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.68
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 39,
+          "acr_mg_g": 330,
+          "potassium_mmol_l": 4.7,
+          "creatinine_mg_dl": 1.72
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 38,
+          "acr_mg_g": 340,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 1.77
+        }
+      ],
+      "medications": [
+        {
+          "name": "losartan",
+          "dose": "100 mg",
+          "class": "ARB",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C5_gap_nonfire",
+        "category_label": "Correct gap non-fire (optimised / below threshold)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 38 >= 30, ACR < 620, KFRE 4.6% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 4.6
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Atrial fibrillation"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c5-g03",
+      "name": "Mei T.",
+      "age": 73,
+      "sex": "F",
+      "diabetes": true,
+      "problems": [
+        "type 2 diabetes",
+        "hypertension",
+        "CKD",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 40,
+          "acr_mg_g": 320,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.5
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 39,
+          "acr_mg_g": 330,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.54
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 38,
+          "acr_mg_g": 340,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.58
+        }
+      ],
+      "medications": [
+        {
+          "name": "losartan",
+          "dose": "100 mg",
+          "class": "ARB",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "finerenone",
+          "dose": "20 mg",
+          "class": "nsMRA"
+        },
+        {
+          "name": "metformin",
+          "dose": "1 g",
+          "class": "biguanide"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C5_gap_nonfire",
+        "category_label": "Correct gap non-fire (optimised / below threshold)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "finerenone",
+            "reason": "Already on finerenone."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 38 >= 30, ACR < 620, KFRE 2.7% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 2.7
+      },
+      "comorbidities": [
+        "Type 2 diabetes mellitus",
+        "Hypertension",
+        "Chronic kidney disease",
+        "Ischaemic heart disease",
+        "GORD",
+        "Peripheral vascular disease"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c5-g04",
+      "name": "Frank F.",
+      "age": 60,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 50,
+          "acr_mg_g": 60,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.34
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 49,
+          "acr_mg_g": 75,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.37
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 49,
+          "acr_mg_g": 90,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.37
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C5_gap_nonfire",
+        "category_label": "Correct gap non-fire (optimised / below threshold)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A2",
+        "risk_tier": "orange",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~0.5 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "SGLT2 inhibitor",
+            "reason": "ACR 90 (< 200), no HF, non-diabetic \u2014 SGLT2 inhibitor not indicated."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 49 >= 30, ACR < 620, KFRE 0.7% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 0.7
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Peripheral vascular disease"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c5-g05",
+      "name": "Wei H.",
+      "age": 66,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 51,
+          "acr_mg_g": 60,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 1.32
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 50,
+          "acr_mg_g": 75,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.34
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 50,
+          "acr_mg_g": 90,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.34
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C5_gap_nonfire",
+        "category_label": "Correct gap non-fire (optimised / below threshold)",
+        "jtbd": "withhold",
+        "jtbd_desc": "Show what was deliberately NOT surfaced, and why.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A2",
+        "risk_tier": "orange",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~0.5 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "SGLT2 inhibitor",
+            "reason": "ACR 90 (< 200), no HF, non-diabetic \u2014 SGLT2 inhibitor not indicated."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 50 >= 30, ACR < 620, KFRE 0.6% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 0.6
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Atrial fibrillation"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c6-g01",
+      "name": "Amina W.",
+      "age": 59,
+      "sex": "F",
+      "diabetes": true,
+      "problems": [
+        "type 2 diabetes",
+        "hypertension",
+        "CKD",
+        "albuminuria",
+        "hyperkalaemia"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 45,
+          "acr_mg_g": 360,
+          "potassium_mmol_l": 5.6,
+          "creatinine_mg_dl": 1.33
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 44,
+          "acr_mg_g": 385,
+          "potassium_mmol_l": 5.5,
+          "creatinine_mg_dl": 1.36
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 43,
+          "acr_mg_g": 410,
+          "potassium_mmol_l": 5.5,
+          "creatinine_mg_dl": 1.4
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "5 mg",
+          "class": "ACEi",
+          "at_max": false
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "metformin",
+          "dose": "1 g",
+          "class": "biguanide"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C6_safety_gate",
+        "category_label": "Safety gating (hyperkalaemia)",
+        "jtbd": "gate",
+        "jtbd_desc": "Never recommend starting a drug that's unsafe right now.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "gap_gated",
+            "drug": "finerenone",
+            "priority": 1,
+            "summary": "Finerenone (nsMRA) indicated (T2D + albuminuric CKD, on RASi, eGFR 43 >= 25) but gated on K+ 5.5 (>= 5.5) \u2014 treat hyperkalaemia first."
+          },
+          {
+            "type": "safety",
+            "item": "hyperkalaemia",
+            "priority": 1,
+            "summary": "K+ 5.5 (>= 5.5) \u2014 address (dietary review, K-binder, review RASi dose) before adding a nsMRA or up-titrating RASi."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "gated_hold",
+            "item": "finerenone",
+            "reason": "Indicated but gated on K+ 5.5 (>= 5.5) \u2014 treat hyperkalaemia first."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 43 >= 30, ACR < 620, KFRE 2.3% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 2.3
+      },
+      "comorbidities": [
+        "Type 2 diabetes mellitus",
+        "Hypertension",
+        "Chronic kidney disease",
+        "Peripheral vascular disease",
+        "Ischaemic heart disease"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c6-g02",
+      "name": "Grace K.",
+      "age": 72,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "CKD",
+        "albuminuria",
+        "hyperkalaemia"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 40,
+          "acr_mg_g": 360,
+          "potassium_mmol_l": 5.6,
+          "creatinine_mg_dl": 1.5
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 39,
+          "acr_mg_g": 385,
+          "potassium_mmol_l": 5.6,
+          "creatinine_mg_dl": 1.54
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 38,
+          "acr_mg_g": 410,
+          "potassium_mmol_l": 5.6,
+          "creatinine_mg_dl": 1.58
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "5 mg",
+          "class": "ACEi",
+          "at_max": false
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C6_safety_gate",
+        "category_label": "Safety gating (hyperkalaemia)",
+        "jtbd": "gate",
+        "jtbd_desc": "Never recommend starting a drug that's unsafe right now.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "safety",
+            "item": "hyperkalaemia",
+            "priority": 1,
+            "summary": "K+ 5.6 (>= 5.5) \u2014 address (dietary review, K-binder, review RASi dose) before adding a nsMRA or up-titrating RASi."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 38 >= 30, ACR < 620, KFRE 2.9% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 2.9
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Gout"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c6-g03",
+      "name": "Aisha T.",
+      "age": 63,
+      "sex": "F",
+      "diabetes": true,
+      "problems": [
+        "type 2 diabetes",
+        "hypertension",
+        "CKD",
+        "albuminuria",
+        "hyperkalaemia"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 37,
+          "acr_mg_g": 360,
+          "potassium_mmol_l": 5.6,
+          "creatinine_mg_dl": 1.62
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 36,
+          "acr_mg_g": 385,
+          "potassium_mmol_l": 5.7,
+          "creatinine_mg_dl": 1.67
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 35,
+          "acr_mg_g": 410,
+          "potassium_mmol_l": 5.7,
+          "creatinine_mg_dl": 1.71
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "5 mg",
+          "class": "ACEi",
+          "at_max": false
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "metformin",
+          "dose": "1 g",
+          "class": "biguanide"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C6_safety_gate",
+        "category_label": "Safety gating (hyperkalaemia)",
+        "jtbd": "gate",
+        "jtbd_desc": "Never recommend starting a drug that's unsafe right now.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "gap_gated",
+            "drug": "finerenone",
+            "priority": 1,
+            "summary": "Finerenone (nsMRA) indicated (T2D + albuminuric CKD, on RASi, eGFR 35 >= 25) but gated on K+ 5.7 (>= 5.5) \u2014 treat hyperkalaemia first."
+          },
+          {
+            "type": "safety",
+            "item": "hyperkalaemia",
+            "priority": 1,
+            "summary": "K+ 5.7 (>= 5.5) \u2014 address (dietary review, K-binder, review RASi dose) before adding a nsMRA or up-titrating RASi."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "gated_hold",
+            "item": "finerenone",
+            "reason": "Indicated but gated on K+ 5.7 (>= 5.5) \u2014 treat hyperkalaemia first."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 35 >= 30, ACR < 620, KFRE 5.0% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 5.0
+      },
+      "comorbidities": [
+        "Type 2 diabetes mellitus",
+        "Hypertension",
+        "Chronic kidney disease",
+        "Gout",
+        "Hypothyroidism",
+        "Osteoarthritis"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c6-g04",
+      "name": "Daniel K.",
+      "age": 66,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "CKD",
+        "albuminuria",
+        "hyperkalaemia"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 40,
+          "acr_mg_g": 360,
+          "potassium_mmol_l": 5.7,
+          "creatinine_mg_dl": 1.68
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 39,
+          "acr_mg_g": 385,
+          "potassium_mmol_l": 5.7,
+          "creatinine_mg_dl": 1.72
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 38,
+          "acr_mg_g": 410,
+          "potassium_mmol_l": 5.7,
+          "creatinine_mg_dl": 1.77
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "5 mg",
+          "class": "ACEi",
+          "at_max": false
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C6_safety_gate",
+        "category_label": "Safety gating (hyperkalaemia)",
+        "jtbd": "gate",
+        "jtbd_desc": "Never recommend starting a drug that's unsafe right now.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "safety",
+            "item": "hyperkalaemia",
+            "priority": 1,
+            "summary": "K+ 5.7 (>= 5.5) \u2014 address (dietary review, K-binder, review RASi dose) before adding a nsMRA or up-titrating RASi."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 38 >= 30, ACR < 620, KFRE 4.3% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 4.3
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Hyperlipidaemia",
+        "Obesity",
+        "Hypothyroidism"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c6-g05",
+      "name": "Frank A.",
+      "age": 65,
+      "sex": "M",
+      "diabetes": true,
+      "problems": [
+        "type 2 diabetes",
+        "hypertension",
+        "CKD",
+        "albuminuria",
+        "hyperkalaemia"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 44,
+          "acr_mg_g": 360,
+          "potassium_mmol_l": 5.8,
+          "creatinine_mg_dl": 1.53
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 43,
+          "acr_mg_g": 385,
+          "potassium_mmol_l": 5.9,
+          "creatinine_mg_dl": 1.56
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 42,
+          "acr_mg_g": 410,
+          "potassium_mmol_l": 5.9,
+          "creatinine_mg_dl": 1.6
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "5 mg",
+          "class": "ACEi",
+          "at_max": false
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        },
+        {
+          "name": "metformin",
+          "dose": "1 g",
+          "class": "biguanide"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C6_safety_gate",
+        "category_label": "Safety gating (hyperkalaemia)",
+        "jtbd": "gate",
+        "jtbd_desc": "Never recommend starting a drug that's unsafe right now.",
+        "persona": "chen",
+        "persona_role": "Nephrology-adjacent reviewer",
+        "difficulty": "hard"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3b A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "gap_gated",
+            "drug": "finerenone",
+            "priority": 1,
+            "summary": "Finerenone (nsMRA) indicated (T2D + albuminuric CKD, on RASi, eGFR 42 >= 25) but gated on K+ 5.9 (>= 5.5) \u2014 treat hyperkalaemia first."
+          },
+          {
+            "type": "safety",
+            "item": "hyperkalaemia",
+            "priority": 1,
+            "summary": "K+ 5.9 (>= 5.5) \u2014 address (dietary review, K-binder, review RASi dose) before adding a nsMRA or up-titrating RASi."
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "gated_hold",
+            "item": "finerenone",
+            "reason": "Indicated but gated on K+ 5.9 (>= 5.5) \u2014 treat hyperkalaemia first."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 42 >= 30, ACR < 620, KFRE 2.8% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 2.8
+      },
+      "comorbidities": [
+        "Type 2 diabetes mellitus",
+        "Hypertension",
+        "Chronic kidney disease",
+        "Hyperlipidaemia",
+        "Atrial fibrillation",
+        "Ischaemic heart disease"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c7-g01",
+      "name": "Grace J.",
+      "age": 63,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "CKD",
+        "hypertension"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 27,
+          "acr_mg_g": 40,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 2.22
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 26,
+          "acr_mg_g": 45,
+          "potassium_mmol_l": 4.7,
+          "creatinine_mg_dl": 2.31
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 25,
+          "acr_mg_g": 50,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 2.4
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C7_referral",
+        "category_label": "Referral fire / non-fire",
+        "jtbd": "escalate",
+        "jtbd_desc": "Draft the referral when criteria are met.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "easy"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G4 A2",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "referral",
+            "priority": 3,
+            "summary": "Draft nephrology referral \u2014 trigger: eGFR 25 < 30; KFRE 5-yr 5.8% >= 5%. (KFRE 5-yr 5.8%.)"
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "SGLT2 inhibitor",
+            "reason": "ACR 50 (< 200), no HF, non-diabetic \u2014 SGLT2 inhibitor not indicated."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 5.8
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Gout",
+        "Hypothyroidism"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c7-g02",
+      "name": "Nadia J.",
+      "age": 66,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "CKD",
+        "hypertension"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 28,
+          "acr_mg_g": 40,
+          "potassium_mmol_l": 4.5,
+          "creatinine_mg_dl": 2.14
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 27,
+          "acr_mg_g": 45,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 2.22
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 26,
+          "acr_mg_g": 50,
+          "potassium_mmol_l": 4.6,
+          "creatinine_mg_dl": 2.31
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C7_referral",
+        "category_label": "Referral fire / non-fire",
+        "jtbd": "escalate",
+        "jtbd_desc": "Draft the referral when criteria are met.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "easy"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G4 A2",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "referral",
+            "priority": 3,
+            "summary": "Draft nephrology referral \u2014 trigger: eGFR 26 < 30. (KFRE 5-yr 4.9%.)"
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "SGLT2 inhibitor",
+            "reason": "ACR 50 (< 200), no HF, non-diabetic \u2014 SGLT2 inhibitor not indicated."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 4.9
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Ischaemic heart disease"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c7-g03",
+      "name": "Raj E.",
+      "age": 52,
+      "sex": "M",
+      "diabetes": false,
+      "problems": [
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 50,
+          "acr_mg_g": 650,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.34
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 49,
+          "acr_mg_g": 685,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.37
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 48,
+          "acr_mg_g": 720,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.4
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C7_referral",
+        "category_label": "Referral fire / non-fire",
+        "jtbd": "escalate",
+        "jtbd_desc": "Draft the referral when criteria are met.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A3",
+        "risk_tier": "red",
+        "surface": [
+          {
+            "type": "referral",
+            "priority": 3,
+            "summary": "Draft nephrology referral \u2014 trigger: ACR 720 >= 620 mg/g. (KFRE 5-yr 2.5%.)"
+          }
+        ],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "already_optimised",
+            "item": "statin",
+            "reason": "Already on a statin."
+          }
+        ],
+        "kfre_5yr_pct": 2.5
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Peripheral vascular disease",
+        "Osteoarthritis",
+        "Benign prostatic hyperplasia"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    },
+    {
+      "id": "c7-g04",
+      "name": "Aisha E.",
+      "age": 47,
+      "sex": "F",
+      "diabetes": false,
+      "problems": [
+        "hypertension",
+        "albuminuria"
+      ],
+      "labs": [
+        {
+          "date": "2024-02-02",
+          "egfr": 57,
+          "acr_mg_g": 320,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.05
+        },
+        {
+          "date": "2025-02-01",
+          "egfr": 56,
+          "acr_mg_g": 330,
+          "potassium_mmol_l": 4.4,
+          "creatinine_mg_dl": 1.07
+        },
+        {
+          "date": "2026-02-01",
+          "egfr": 55,
+          "acr_mg_g": 340,
+          "potassium_mmol_l": 4.3,
+          "creatinine_mg_dl": 1.09
+        }
+      ],
+      "medications": [
+        {
+          "name": "ramipril",
+          "dose": "10 mg",
+          "class": "ACEi",
+          "at_max": true
+        },
+        {
+          "name": "dapagliflozin",
+          "dose": "10 mg",
+          "class": "SGLT2i"
+        },
+        {
+          "name": "atorvastatin",
+          "dose": "20 mg",
+          "class": "statin"
+        }
+      ],
+      "source": "generated",
+      "tags": {
+        "category": "C7_referral",
+        "category_label": "Referral fire / non-fire",
+        "jtbd": "escalate",
+        "jtbd_desc": "Draft the referral when criteria are met.",
+        "persona": "bola",
+        "persona_role": "Care-coordinating nurse",
+        "difficulty": "medium"
+      },
+      "expected": {
+        "ckd": true,
+        "stage": "G3a A3",
+        "risk_tier": "red",
+        "surface": [],
+        "suppress": [
+          {
+            "type": "no_progression",
+            "item": "trajectory",
+            "reason": "Slope ~1.0 mL/min/yr \u2014 below the rapid-progression threshold (5.0). Stable; nothing to action on trajectory."
+          },
+          {
+            "type": "already_optimised",
+            "item": "RAS inhibitor",
+            "reason": "Already on a RAS inhibitor."
+          },
+          {
+            "type": "already_optimised",
+            "item": "SGLT2 inhibitor",
+            "reason": "Already on an SGLT2 inhibitor."
+          },
+          {
+            "type": "not_indicated",
+            "item": "finerenone",
+            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+          },
+          {
+            "type": "no_referral",
+            "item": "referral",
+            "reason": "No referral criterion met (eGFR 55 >= 30, ACR < 620, KFRE 0.7% < 5%, not rapid) \u2014 do not escalate."
+          }
+        ],
+        "kfre_5yr_pct": 0.7
+      },
+      "comorbidities": [
+        "Hypertension",
+        "Chronic kidney disease",
+        "Ischaemic heart disease"
+      ],
+      "encounters": [
+        {
+          "date": "2026-02-01",
+          "type": "CKD annual review",
+          "summary": "Bloods and urine ACR checked; blood pressure recorded; medications reviewed."
+        },
+        {
+          "date": "2025-02-01",
+          "type": "Medication review",
+          "summary": "Repeat prescriptions reviewed."
+        }
+      ]
+    }
+  ]
+}
