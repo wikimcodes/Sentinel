@@ -129,6 +129,18 @@
         "ckd": true,
         "stage": "G3b A3",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3B",
+            "snomed": "700379002",
+            "icd10": "N18.32"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -270,6 +282,7 @@
         "stage": null,
         "risk_tier": null,
         "surface": [],
+        "codes": [],
         "suppress": [
           {
             "type": "not_ckd",
@@ -364,6 +377,18 @@
         "ckd": true,
         "stage": "G3b A2",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3B",
+            "snomed": "700379002",
+            "icd10": "N18.32"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -491,6 +516,18 @@
         "ckd": true,
         "stage": "G3b A3",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3B",
+            "snomed": "700379002",
+            "icd10": "N18.32"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "referral",
@@ -626,6 +663,18 @@
         "ckd": true,
         "stage": "G3a A3",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap_gated",
@@ -780,6 +829,23 @@
         "ckd": true,
         "stage": "G3b A3",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3B",
+            "snomed": "700379002",
+            "icd10": "N18.32"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [
           {
             "type": "gap_gated",
@@ -949,6 +1015,23 @@
         "ckd": true,
         "stage": "G3b A3",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3B",
+            "snomed": "700379002",
+            "icd10": "N18.32"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -1086,6 +1169,23 @@
         "ckd": true,
         "stage": "G4 A2",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 4",
+            "snomed": "431857002",
+            "icd10": "N18.4"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [
           {
             "type": "referral",
@@ -1238,6 +1338,18 @@
         "ckd": true,
         "stage": "G3b A2",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3B",
+            "snomed": "700379002",
+            "icd10": "N18.32"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -1371,6 +1483,18 @@
         "ckd": true,
         "stage": "G4 A3",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 4",
+            "snomed": "431857002",
+            "icd10": "N18.4"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -1490,6 +1614,18 @@
         "ckd": true,
         "stage": "G5 A3",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 5",
+            "snomed": "433146000",
+            "icd10": "N18.5"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [],
         "suppress": [
           {
@@ -1645,6 +1781,18 @@
         "ckd": true,
         "stage": "G3a A3",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -1776,6 +1924,23 @@
         "ckd": true,
         "stage": "G3b A3",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3B",
+            "snomed": "700379002",
+            "icd10": "N18.32"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [
           {
             "type": "referral",
@@ -1897,6 +2062,18 @@
         "ckd": true,
         "stage": "G3a A3",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -2012,6 +2189,18 @@
         "ckd": true,
         "stage": "G4 A2",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 4",
+            "snomed": "431857002",
+            "icd10": "N18.4"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "referral",
@@ -2180,6 +2369,23 @@
         "ckd": true,
         "stage": "G3b A3",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3B",
+            "snomed": "700379002",
+            "icd10": "N18.32"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -2321,6 +2527,23 @@
         "ckd": true,
         "stage": "G3b A3",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3B",
+            "snomed": "700379002",
+            "icd10": "N18.32"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [
           {
             "type": "gap_gated",
@@ -2474,6 +2697,23 @@
         "ckd": true,
         "stage": "G4 A2",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 4",
+            "snomed": "431857002",
+            "icd10": "N18.4"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [
           {
             "type": "trajectory",
@@ -2597,6 +2837,18 @@
         "ckd": true,
         "stage": "G4 A2",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 4",
+            "snomed": "431857002",
+            "icd10": "N18.4"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -2707,6 +2959,23 @@
         "ckd": true,
         "stage": "G5 A3",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 5",
+            "snomed": "433146000",
+            "icd10": "N18.5"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [],
         "suppress": [
           {
@@ -2833,6 +3102,18 @@
         "ckd": true,
         "stage": "G3a A2",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -2965,6 +3246,18 @@
         "ckd": true,
         "stage": "G3b A2",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3B",
+            "snomed": "700379002",
+            "icd10": "N18.32"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -3106,6 +3399,18 @@
         "ckd": true,
         "stage": "G3a A2",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -3243,6 +3548,18 @@
         "ckd": true,
         "stage": "G3a A2",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [],
         "suppress": [
           {
@@ -3397,6 +3714,23 @@
         "ckd": true,
         "stage": "G3a A2",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -3581,6 +3915,18 @@
         "ckd": true,
         "stage": "G3a A2",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "trajectory",
@@ -3717,6 +4063,18 @@
         "ckd": true,
         "stage": "G2 A3",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 2",
+            "snomed": "431856006",
+            "icd10": "N18.2"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "referral",
@@ -3870,6 +4228,23 @@
         "ckd": true,
         "stage": "G3a A2",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -4026,6 +4401,23 @@
         "ckd": true,
         "stage": "G2 A3",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 2",
+            "snomed": "431856006",
+            "icd10": "N18.2"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -4174,6 +4566,18 @@
         "ckd": true,
         "stage": "G2 A3",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 2",
+            "snomed": "431856006",
+            "icd10": "N18.2"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -4301,6 +4705,23 @@
         "ckd": true,
         "stage": "G3a A2",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -4368,8 +4789,8 @@
           "potassium_mmol_l": 4.5,
           "creatinine_mg_dl": 1.6,
           "flags": [
-            "acute_illness",
-            "trimethoprim_course"
+            "trimethoprim_course",
+            "acute_illness"
           ]
         }
       ],
@@ -4477,6 +4898,18 @@
         "ckd": true,
         "stage": "G3b A2",
         "risk_tier": "red",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3B",
+            "snomed": "700379002",
+            "icd10": "N18.32"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -4619,6 +5052,23 @@
         "ckd": true,
         "stage": "G3a A2",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -4795,6 +5245,18 @@
         "ckd": true,
         "stage": "G3a A2",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -4930,6 +5392,13 @@
         "ckd": true,
         "stage": "G3b A1",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3B",
+            "snomed": "700379002",
+            "icd10": "N18.32"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -5071,6 +5540,18 @@
         "ckd": true,
         "stage": "G1 A3",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 1",
+            "snomed": "431855005",
+            "icd10": "N18.1"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -5169,6 +5650,18 @@
         "ckd": true,
         "stage": "G3a A2",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [],
         "suppress": [
           {
@@ -5283,6 +5776,18 @@
         "ckd": true,
         "stage": "G2 A3",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 2",
+            "snomed": "431856006",
+            "icd10": "N18.2"
+          },
+          {
+            "label": "Severe albuminuria (macroalbuminuria)",
+            "snomed": null,
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "referral",
@@ -5425,6 +5930,18 @@
         "ckd": true,
         "stage": "G3a A2",
         "risk_tier": "orange",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -5494,8 +6011,8 @@
           "potassium_mmol_l": 4.4,
           "creatinine_mg_dl": 0.95,
           "flags": [
-            "acute_illness",
-            "trimethoprim_course"
+            "trimethoprim_course",
+            "acute_illness"
           ]
         }
       ],
@@ -5547,6 +6064,7 @@
         "stage": null,
         "risk_tier": null,
         "surface": [],
+        "codes": [],
         "suppress": [
           {
             "type": "not_ckd",
@@ -5611,6 +6129,7 @@
         "stage": null,
         "risk_tier": null,
         "surface": [],
+        "codes": [],
         "suppress": [
           {
             "type": "not_ckd",
@@ -5709,6 +6228,13 @@
         "ckd": true,
         "stage": "G3a A1",
         "risk_tier": "yellow",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -5811,6 +6337,18 @@
         "ckd": true,
         "stage": "G3a A1",
         "risk_tier": "yellow",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [],
         "suppress": [
           {
@@ -5924,6 +6462,18 @@
         "ckd": true,
         "stage": "G1 A2",
         "risk_tier": "yellow",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 1",
+            "snomed": "431855005",
+            "icd10": "N18.1"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -6029,6 +6579,13 @@
         "ckd": true,
         "stage": "G3a A1",
         "risk_tier": "yellow",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -6134,6 +6691,18 @@
         "ckd": true,
         "stage": "G2 A2",
         "risk_tier": "yellow",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 2",
+            "snomed": "431856006",
+            "icd10": "N18.2"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          }
+        ],
         "surface": [
           {
             "type": "gap",
@@ -6251,6 +6820,13 @@
         "ckd": true,
         "stage": "G3a A1",
         "risk_tier": "yellow",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 3A",
+            "snomed": "700378005",
+            "icd10": "N18.31"
+          }
+        ],
         "surface": [],
         "suppress": [
           {
@@ -6334,6 +6910,7 @@
         "stage": null,
         "risk_tier": null,
         "surface": [],
+        "codes": [],
         "suppress": [
           {
             "type": "not_ckd",
@@ -6378,8 +6955,8 @@
           "potassium_mmol_l": 4.3,
           "creatinine_mg_dl": 0.81,
           "flags": [
-            "acute_illness",
-            "trimethoprim_course"
+            "trimethoprim_course",
+            "acute_illness"
           ]
         }
       ],
@@ -6425,6 +7002,7 @@
         "stage": null,
         "risk_tier": null,
         "surface": [],
+        "codes": [],
         "suppress": [
           {
             "type": "not_ckd",
@@ -6549,6 +7127,23 @@
         "ckd": true,
         "stage": "G1 A2",
         "risk_tier": "yellow",
+        "codes": [
+          {
+            "label": "Chronic kidney disease, stage 1",
+            "snomed": "431855005",
+            "icd10": "N18.1"
+          },
+          {
+            "label": "Microalbuminuria",
+            "snomed": "197655007",
+            "icd10": "R80.9"
+          },
+          {
+            "label": "Type 2 diabetes with diabetic CKD",
+            "snomed": null,
+            "icd10": "E11.22"
+          }
+        ],
         "surface": [
           {
             "type": "gap",

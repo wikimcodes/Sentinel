@@ -226,16 +226,46 @@ def referral_recommendation(patient: dict) -> dict:
 # ---------------------------------------------------------------------------
 # COMPOSITION — the deterministic reference review (what the agent orchestrates)
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Diagnosis coding — computed CKD stage -> standard clinical codes (SNOMED CT + ICD-10).
+# SNOMED concept IDs should be validated against a terminology server (NHS TS /
+# Ontoserver) before clinical use; open-ended codes resolve via FHIR $translate.
+# ---------------------------------------------------------------------------
+_GFR_CODES = {
+    "G1":  ("431855005", "N18.1"),  "G2":  ("431856006", "N18.2"),
+    "G3a": ("700378005", "N18.31"), "G3b": ("700379002", "N18.32"),
+    "G4":  ("431857002", "N18.4"),  "G5":  ("433146000", "N18.5"),
+}
+def diagnosis_codes(egfr, acr, diabetes=False, hypertension=False):
+    """Standard codes for the computed CKD diagnosis (SNOMED CT + ICD-10)."""
+    g, a = gfr_category(egfr), acr_category(acr)
+    out = []
+    sn, icd = _GFR_CODES.get(g, (None, None))
+    if sn:
+        out.append({"label": f"Chronic kidney disease, stage {g[1:].upper()}", "snomed": sn, "icd10": icd})
+    if a == "A2":
+        out.append({"label": "Microalbuminuria", "snomed": "197655007", "icd10": "R80.9"})
+    elif a == "A3":
+        out.append({"label": "Severe albuminuria (macroalbuminuria)", "snomed": None, "icd10": "R80.9"})
+    if diabetes:
+        out.append({"label": "Type 2 diabetes with diabetic CKD", "snomed": None, "icd10": "E11.22"})
+    if hypertension:
+        out.append({"label": "Hypertensive chronic kidney disease", "snomed": None, "icd10": "I12.9"})
+    return out
+
+
 def review_patient(patient: dict) -> dict:
-    """Full between-visit review: {ckd, stage, risk_tier, surface, suppress, kfre_5yr_pct}.
+    """Full between-visit review: {ckd, stage, risk_tier, surface, suppress, kfre_5yr_pct, codes}.
     Surface/suppress items are (type, drug|item) — the eval compares on those keys."""
     labs = sorted(patient["labs"], key=lambda l: l["date"])
     lab = labs[-1]
     egfr, acr, k = lab["egfr"], lab["acr_mg_g"], lab["potassium_mmol_l"]
+    hyp = any("hypertension" in str(x).lower() for x in patient.get("problems", []) + patient.get("comorbidities", []))
+    codes = diagnosis_codes(egfr, acr, patient["diabetes"], hyp)
 
     if not meets_ckd_definition(egfr, acr, patient.get("haematuria"), patient.get("structural_marker")):
         g, a = gfr_category(egfr), acr_category(acr)
-        return {"ckd": False, "stage": None, "risk_tier": None, "surface": [],
+        return {"ckd": False, "stage": None, "risk_tier": None, "surface": [], "codes": [],
                 "suppress": [{"type": "not_ckd", "item": "patient",
                               "reason": f"{g} {a} with no damage marker — does not meet the CKD definition gate."}],
                 "kfre_5yr_pct": round(kfre_5yr_risk(patient["age"], patient["sex"], egfr, acr) * 100, 1)}
@@ -249,7 +279,7 @@ def review_patient(patient: dict) -> dict:
                     "summary": "Refer for joint obstetric-nephrology care — all CKD pharmacotherapy (RASi, SGLT2i, statin, finerenone) is contraindicated in pregnancy."}]
         suppress = [{"type": "not_indicated", "item": m["drug"], "reason": m["reason"]}
                     for m in evaluate_medications(patient) if m["status"] == "contraindicated"]
-        return {"ckd": True, "stage": st["stage"], "risk_tier": st["risk_tier"],
+        return {"ckd": True, "stage": st["stage"], "risk_tier": st["risk_tier"], "codes": codes,
                 "surface": surface, "suppress": suppress, "kfre_5yr_pct": kfre_pct}
 
     surface, suppress = [], []
@@ -314,5 +344,5 @@ def review_patient(patient: dict) -> dict:
                          "reason": f"No referral criterion met (KFRE {ref['kfre_5yr_pct']}%) — do not escalate."})
 
     surface.sort(key=lambda s: s.get("priority", 9))
-    return {"ckd": True, "stage": st["stage"], "risk_tier": st["risk_tier"],
+    return {"ckd": True, "stage": st["stage"], "risk_tier": st["risk_tier"], "codes": codes,
             "surface": surface, "suppress": suppress, "kfre_5yr_pct": ref["kfre_5yr_pct"]}

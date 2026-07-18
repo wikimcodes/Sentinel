@@ -37,6 +37,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const sortedLabs = (p) => [...p.labs].sort((a, b) => a.date.localeCompare(b.date));
 const topLine = (p) => (!p.expected.ckd ? "Not CKD" : p.expected.surface.length ? p.expected.surface[0].summary : "Reviewed — no action");
 
+// A free-text problem is "already coded" when one of the computed diagnosis codes expresses it.
+const codedAlready = (c, codes) => {
+  const cl = c.toLowerCase();
+  const blob = (codes || []).map((x) => x.label.toLowerCase()).join(" ");
+  if (cl.includes("chronic kidney")) return blob.includes("chronic kidney");
+  if (cl.includes("hypertension"))   return blob.includes("hypertensive");
+  if (cl.includes("diabetes"))       return blob.includes("diabet");
+  if (cl.includes("albumin"))        return blob.includes("albumin");
+  return false;
+};
+
 // SystmOne-style investigations grid: rows = tests, columns = dates.
 function ResultsTable({ labs, editing, onEdit, onDate, onAddTest, onToggleEdit, onTrend }) {
   const lastIdx = labs.length - 1;
@@ -336,8 +347,29 @@ function EHRReview({ patient }) {
         <div className="ehr">
           <div className="ehr-grid">
             <div className="ehr-box">
-              <h4>Problem list</h4>
-              <div className="chips">{(patient.comorbidities || []).map((c) => <span key={c} className="chip">{c}</span>)}</div>
+              <h4>Problem list <span className="coded-hint" title="Diagnoses auto-coded from the computed stage — SNOMED CT (clinical) + ICD-10 (billing), resolved via a FHIR terminology server in production">SNOMED CT · ICD-10</span></h4>
+              <div className="problems">
+                {(patient.expected.codes || []).map((c) => (
+                  <div key={c.label} className="prob-row">
+                    <span className="prob-name">{c.label}</span>
+                    <span className="prob-codes">
+                      {c.snomed && <code title="SNOMED CT — clinical terminology">SNOMED {c.snomed}</code>}
+                      <code title="ICD-10 — classification / billing">ICD-10 {c.icd10}</code>
+                    </span>
+                  </div>
+                ))}
+                {(patient.comorbidities || [])
+                  .filter((c) => !codedAlready(c, patient.expected.codes))
+                  .map((c) => (
+                    <div key={c} className="prob-row">
+                      <span className="prob-name">{c}</span>
+                      <span className="prob-uncoded">uncoded</span>
+                    </div>
+                  ))}
+                {(patient.expected.codes || []).length === 0 && (patient.comorbidities || []).length === 0 && (
+                  <div className="none">None recorded</div>
+                )}
+              </div>
             </div>
             <div className="ehr-box">
               <h4>Current medications</h4>

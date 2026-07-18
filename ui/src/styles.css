@@ -498,3 +498,22 @@ h1 { font-size: 27px; } h2 { font-size: 26px; }
 .qa-a .rt-li::before { content: "•"; color: var(--accent); position: absolute; left: 2px; font-weight: 700; }
 .qa-a strong { font-weight: 700; }
 .qa-tools { margin: 6px 0 0; font-size: 11px; color: var(--text-dim); text-transform: none; }
+
+/* coded diagnosis on the patient banner */
+.pb-code { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12.5px; color: var(--text-dim); flex-wrap: wrap; }
+.code-tag { font-size: 9px; font-weight: 800; letter-spacing: .5px; background: var(--text); color: var(--surface); border-radius: 5px; padding: 2px 6px; }
+.pb-code code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 6px; padding: 1px 7px; color: var(--text); }
+
+/* Problem list — each diagnosis on its own line with its clinical code */
+.coded-hint { font-size: 9.5px; font-weight: 700; letter-spacing: .4px; color: var(--accent);
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 2px 6px; margin-left: 8px; }
+.problems { display: flex; flex-direction: column; gap: 6px; }
+.prob-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  padding: 6px 0; border-bottom: 1px solid var(--border); }
+.prob-row:last-child { border-bottom: none; }
+.prob-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.prob-codes { display: flex; gap: 6px; flex-wrap: wrap; }
+.prob-codes code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 10.5px; background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 6px; padding: 1px 7px; color: var(--text); white-space: nowrap; }
+.prob-uncoded { font-size: 10px; letter-spacing: .3px; color: var(--text-dim); font-style: italic; }

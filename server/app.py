@@ -165,9 +165,14 @@ def referral_letter(patient):
         return None, "template"
     lab = sorted(patient["labs"], key=lambda l: l["date"])[-1]
     trigger = ref_item["summary"].split("trigger:")[-1].split("(KFRE")[0].strip().rstrip(".")
+    coded = "; ".join(
+        c["label"] + " (" + ", ".join(x for x in [f"SNOMED {c['snomed']}" if c.get("snomed") else None,
+                                                   f"ICD-10 {c['icd10']}" if c.get("icd10") else None] if x) + ")"
+        for c in review.get("codes", []))
     facts = {
         "name": patient["name"], "age": patient["age"], "sex": patient["sex"],
         "ckd_stage": review["stage"],
+        "coded_diagnosis": coded,
         "eGFR": f"{lab['egfr']} mL/min/1.73m2",
         "urine_ACR": f"{lab['acr_mg_g']} mg/g",           # unit is explicit — do not convert
         "serum_potassium": f"{lab['potassium_mmol_l']} mmol/L",
@@ -186,6 +191,7 @@ Background: {', '.join(facts['comorbidities'][:4])}.
 
 I am referring this patient for nephrology assessment.
 
+Coded diagnosis: {facts['coded_diagnosis']}.
 Trigger: {facts['referral_trigger']}.
 Latest bloods: eGFR {facts['eGFR']}, urine ACR {facts['urine_ACR']}, K+ {facts['serum_potassium']}.
 5-year kidney-failure risk (KFRE): {facts['KFRE_5yr']}.
