@@ -36,7 +36,9 @@
     "referral": "KFRE 5-year kidney-failure risk 3-5%; or eGFR <30; or significant albuminuria (A3, ACR >=300 mg/g); or rapid/sustained GFR decline",
     "rasi_monitoring": "check BP, creatinine and potassium within 2-4 weeks of initiation or dose increase (sooner if low eGFR or borderline potassium)",
     "egfr_reliability": "creatinine-based eGFR unreliable at extremes of muscle mass; confirm with cystatin C",
-    "suppression_pseudo_rise": "trimethoprim and cimetidine raise creatinine via blocked tubular secretion without true GFR loss"
+    "suppression_pseudo_rise": "trimethoprim and cimetidine raise creatinine via blocked tubular secretion without true GFR loss",
+    "potassium_gate_rasi": "initiate/continue if K <=5.5 (mitigate if 5.1-5.5); gate (surface but hold) if K >5.5; consider stopping only if uncontrolled or K >=6.0",
+    "potassium_gate_finerenone": "do not initiate finerenone if K >5.0; on treatment withhold if K >5.5 (restart reduced dose when K <=5.0)"
   },
   "patients": [
     {
@@ -681,7 +683,7 @@
         "surface": [
           {
             "finding": "RAS inhibitor indicated (strong) but gated on hyperkalaemia",
-            "trigger_threshold": "albuminuria A3; K 5.7 > 5.0 - treat potassium first"
+            "trigger_threshold": "albuminuria A3; K 5.7 > 5.5 - treat potassium first"
           },
           {
             "finding": "SGLT2 inhibitor indicated and not prescribed",
