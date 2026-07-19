@@ -253,6 +253,25 @@ def diagnosis_codes(egfr, acr, diabetes=False, hypertension=False):
     return out
 
 
+_PROVISIONAL_MARKERS = ("no prior baseline", "first abnormal", "provisional", "no baseline", "unconfirmed")
+
+def chronicity_unconfirmed(patient: dict, labs: list) -> bool:
+    """KDIGO defines CKD as an abnormality that persists >=3 months. A first abnormal
+    result with no prior baseline is provisional — you repeat to confirm chronicity
+    before diagnosing or starting treatment. True only when the record is explicitly a
+    first/baseline-less result AND has no longitudinal confirmation (no two reliable
+    abnormal points >=3 months apart), so established multi-visit patients are unaffected."""
+    ctx = " ".join(str(x).lower() for x in
+                   list(patient.get("problems", [])) + list(patient.get("comorbidities", [])))
+    if not any(m in ctx for m in _PROVISIONAL_MARKERS):
+        return False
+    reliable = [l for l in labs if not (_CONFOUND_FLAGS & set(l.get("flags", [])))]
+    if len(reliable) < 2:
+        return True
+    ds = sorted(date.fromisoformat(l["date"]) for l in reliable)
+    return (ds[-1] - ds[0]).days < 90
+
+
 def review_patient(patient: dict) -> dict:
     """Full between-visit review: {ckd, stage, risk_tier, surface, suppress, kfre_5yr_pct, codes}.
     Surface/suppress items are (type, drug|item) — the eval compares on those keys."""
@@ -280,6 +299,21 @@ def review_patient(patient: dict) -> dict:
                     for m in evaluate_medications(patient) if m["status"] == "contraindicated"]
         return {"ckd": True, "stage": st["stage"], "risk_tier": st["risk_tier"], "codes": codes,
                 "surface": surface, "suppress": suppress, "kfre_5yr_pct": kfre_pct}
+
+    # Chronicity gate: a first abnormal result with no prior baseline is provisional.
+    # KDIGO needs >=3-month persistence — repeat to confirm before diagnosing or treating,
+    # so no medication is started on a single unconfirmed result.
+    if chronicity_unconfirmed(patient, labs):
+        surface = [{"type": "monitor", "priority": 1,
+                    "summary": (f"Abnormal kidney indices ({st['stage']}) on a first result with no prior baseline. "
+                                "KDIGO requires >=3-month persistence — repeat eGFR and ACR to confirm chronicity "
+                                "before any diagnosis or treatment. Monitoring, not a treatment action.")}]
+        suppress = [{"type": "provisional_defer", "item": m["drug"],
+                     "reason": "CKD unconfirmed on a single result — do not start on a provisional diagnosis; "
+                               "confirm >=3-month persistence first."}
+                    for m in evaluate_medications(patient) if m["status"] in ("gap", "gated")]
+        return {"ckd": "unconfirmed", "stage": st["stage"] + " (provisional)", "risk_tier": st["risk_tier"],
+                "codes": codes, "surface": surface, "suppress": suppress, "kfre_5yr_pct": kfre_pct}
 
     surface, suppress = [], []
 

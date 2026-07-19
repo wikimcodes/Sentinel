@@ -379,8 +379,8 @@
         "note": "chronicity not established; monitor, do not treat"
       },
       "expected": {
-        "ckd": true,
-        "stage": "G3b A2",
+        "ckd": "unconfirmed",
+        "stage": "G3b A2 (provisional)",
         "risk_tier": "red",
         "codes": [
           {
@@ -401,36 +401,26 @@
         ],
         "surface": [
           {
-            "type": "gap",
-            "drug": "RAS inhibitor",
-            "priority": 2,
-            "summary": "Albuminuric CKD (A2, non-diabetic) \u2014 RAS inhibitor indicated, not prescribed.",
-            "strength": "weak"
-          },
-          {
-            "type": "gap",
-            "drug": "SGLT2 inhibitor",
-            "priority": 2,
-            "summary": "CKD, eGFR 33 (20-45, 2B) \u2014 SGLT2 inhibitor indicated, not prescribed.",
-            "strength": "weak"
-          },
-          {
-            "type": "gap",
-            "drug": "statin",
-            "priority": 3,
-            "summary": "CKD, age 54 \u2014 statin indicated for CV-risk reduction, not prescribed."
+            "type": "monitor",
+            "priority": 1,
+            "summary": "Abnormal kidney indices (G3b A2) on a first result with no prior baseline. KDIGO requires >=3-month persistence \u2014 repeat eGFR and ACR to confirm chronicity before any diagnosis or treatment. Monitoring, not a treatment action."
           }
         ],
         "suppress": [
           {
-            "type": "not_indicated",
-            "item": "finerenone",
-            "reason": "Non-diabetic \u2014 nsMRA is a T2D-gated indication; do NOT surface."
+            "type": "provisional_defer",
+            "item": "RAS inhibitor",
+            "reason": "CKD unconfirmed on a single result \u2014 do not start on a provisional diagnosis; confirm >=3-month persistence first."
           },
           {
-            "type": "no_referral",
-            "item": "referral",
-            "reason": "No referral criterion met (KFRE 2.8%) \u2014 do not escalate."
+            "type": "provisional_defer",
+            "item": "SGLT2 inhibitor",
+            "reason": "CKD unconfirmed on a single result \u2014 do not start on a provisional diagnosis; confirm >=3-month persistence first."
+          },
+          {
+            "type": "provisional_defer",
+            "item": "statin",
+            "reason": "CKD unconfirmed on a single result \u2014 do not start on a provisional diagnosis; confirm >=3-month persistence first."
           }
         ],
         "kfre_5yr_pct": 2.8

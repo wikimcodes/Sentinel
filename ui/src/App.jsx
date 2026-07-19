@@ -15,6 +15,7 @@ const SURFACE = {
   gap_gated:  { label: "Indicated — gated",   color: "#e07a00" },
   safety:     { label: "Safety",              color: "#c1121f" },
   referral:   { label: "Referral",            color: "#7a4fd0" },
+  monitor:    { label: "Confirm first",       color: "#d97706" },
 };
 const SUPPRESS_LABEL = {
   already_optimised: "Already optimised", not_indicated: "Not indicated",
@@ -22,6 +23,7 @@ const SUPPRESS_LABEL = {
   resolved_aki: "Resolved AKI", pseudo_rise: "Pseudo-rise",
   egfr_failure_mode: "eGFR unreliable", no_progression: "Stable — no progression",
   no_referral: "No referral criterion", not_ckd: "Not CKD",
+  provisional_defer: "Deferred — confirm CKD first",
 };
 
 // Narrow renal panel only — the bloods that drive CKD staging. No FBC / unrelated bloods.
