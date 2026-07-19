@@ -29,7 +29,7 @@ const SUPPRESS_LABEL = {
 // Narrow renal panel only — the bloods that drive CKD staging. No FBC / unrelated bloods.
 const RESULTS = [
   { key: "creatinine_mg_dl",   label: "Creatinine",     unit: "mg/dL",         ref: "0.6–1.3", step: 0.01, lo: 0, hi: 3,  flag: (v) => (v > 1.3 ? "H" : v < 0.6 ? "L" : "") },
-  { key: "egfr",               label: "eGFR",           unit: "mL/min/1.73m²", ref: "> 60",    step: 1,    lo: 15, hi: 95, flag: (v) => (v < 60 ? "L" : "") },
+  { key: "egfr",               label: "eGFR",           unit: "mL/min/1.73m²", ref: "≥ 90",    step: 1,    lo: 15, hi: 95, flag: (v) => (v < 60 ? "L" : "") },
   { key: "acr_mg_g",           label: "Urine ACR",      unit: "mg/g",          ref: "< 30",    step: 1,    lo: 0, hi: 700, flag: (v) => (v >= 30 ? "H" : "") },
   { key: "potassium_mmol_l",   label: "Potassium",      unit: "mmol/L",        ref: "3.5–5.3", step: 0.1,  lo: 3.5, hi: 6.2, flag: (v) => (v > 5.3 ? "H" : v < 3.5 ? "L" : "") },
 ];
