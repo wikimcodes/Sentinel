@@ -77,7 +77,7 @@ def build(wp):
     expected = core.review_patient(p)
 
     como = (["Type 2 diabetes mellitus"] if dm else [])
-    if expected["ckd"]:
+    if expected["ckd"] is True:   # only a CONFIRMED diagnosis; provisional/unconfirmed is not CKD yet
         como += ["Hypertension", "Chronic kidney disease"]
     for kw, name in CONDITION:
         if kw in ctx and name not in como:

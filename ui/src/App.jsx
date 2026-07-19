@@ -334,7 +334,7 @@ function EHRReview({ patient }) {
           {patient.pregnant && <span className="pb-chip warn">⚠ Pregnant</span>}
           {patient.dialysis && <span className="pb-chip warn">⚠ Dialysis</span>}
           <span className="stage-chip" style={{ borderColor: t.color, color: t.color }}>
-            CKD {patient.expected.stage || "—"} · {t.label}
+            {patient.expected.ckd === "unconfirmed" ? "" : "CKD "}{patient.expected.stage || "—"} · {t.label}
           </span>
         </div>
       </header>

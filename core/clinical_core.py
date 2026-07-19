@@ -235,13 +235,20 @@ _GFR_CODES = {
     "G3a": ("700378005", "N18.31"), "G3b": ("700379002", "N18.32"),
     "G4":  ("431857002", "N18.4"),  "G5":  ("433146000", "N18.5"),
 }
-def diagnosis_codes(egfr, acr, diabetes=False, hypertension=False):
-    """Standard codes for the computed CKD diagnosis (SNOMED CT + ICD-10)."""
+def diagnosis_codes(egfr, acr, diabetes=False, hypertension=False, provisional=False):
+    """Standard codes for the computed CKD diagnosis (SNOMED CT + ICD-10).
+    When provisional (a first abnormal result with chronicity unconfirmed), the CKD
+    stage is NOT coded as a diagnosis — a single result cannot establish CKD. It is
+    coded as an abnormal kidney-function finding pending confirmation instead."""
     g, a = gfr_category(egfr), acr_category(acr)
     out = []
-    sn, icd = _GFR_CODES.get(g, (None, None))
-    if sn:
-        out.append({"label": f"Chronic kidney disease, stage {g[1:].upper()}", "snomed": sn, "icd10": icd})
+    if provisional:
+        out.append({"label": "Abnormal kidney function, chronicity unconfirmed (repeat to confirm)",
+                    "snomed": "166717003", "icd10": "R94.4"})
+    else:
+        sn, icd = _GFR_CODES.get(g, (None, None))
+        if sn:
+            out.append({"label": f"Chronic kidney disease, stage {g[1:].upper()}", "snomed": sn, "icd10": icd})
     if a == "A2":
         out.append({"label": "Microalbuminuria", "snomed": "197655007", "icd10": "R80.9"})
     elif a == "A3":
@@ -312,8 +319,9 @@ def review_patient(patient: dict) -> dict:
                      "reason": "CKD unconfirmed on a single result — do not start on a provisional diagnosis; "
                                "confirm >=3-month persistence first."}
                     for m in evaluate_medications(patient) if m["status"] in ("gap", "gated")]
+        prov_codes = diagnosis_codes(egfr, acr, patient["diabetes"], hyp, provisional=True)
         return {"ckd": "unconfirmed", "stage": st["stage"] + " (provisional)", "risk_tier": st["risk_tier"],
-                "codes": codes, "surface": surface, "suppress": suppress, "kfre_5yr_pct": kfre_pct}
+                "codes": prov_codes, "surface": surface, "suppress": suppress, "kfre_5yr_pct": kfre_pct}
 
     surface, suppress = [], []
 

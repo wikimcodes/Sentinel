@@ -327,10 +327,7 @@
         }
       ],
       "medications": [],
-      "comorbidities": [
-        "Hypertension",
-        "Chronic kidney disease"
-      ],
+      "comorbidities": [],
       "encounters": [
         {
           "date": "2025-06-01",
@@ -384,19 +381,14 @@
         "risk_tier": "red",
         "codes": [
           {
-            "label": "Chronic kidney disease, stage 3B",
-            "snomed": "700379002",
-            "icd10": "N18.32"
+            "label": "Abnormal kidney function, chronicity unconfirmed (repeat to confirm)",
+            "snomed": "166717003",
+            "icd10": "R94.4"
           },
           {
             "label": "Microalbuminuria",
             "snomed": "197655007",
             "icd10": "R80.9"
-          },
-          {
-            "label": "Hypertension",
-            "snomed": "38341003",
-            "icd10": "I10"
           }
         ],
         "surface": [
